@@ -20,8 +20,8 @@ const mutations = {
     state.bets = []
   },
   removeBet(state: BetsState, id: number) {
-    state.bets = state.bets.filter(b => b.id !== id)
-  }
+    state.bets = state.bets.filter((b) => b.id !== id)
+  },
 }
 
 const actions = {
@@ -30,10 +30,10 @@ const actions = {
       id: state.bets.length ? state.bets[state.bets.length - 1].id + 1 : 1,
       amount: payload.amount,
       horse: payload.horse,
-      placedAt: Date.now()
+      placedAt: Date.now(),
     }
     commit('addBet', bet)
-  }
+  },
 }
 
 const getters = {
@@ -42,7 +42,7 @@ const getters = {
   },
   betCount(state: BetsState) {
     return state.bets.length
-  }
+  },
 }
 
 export default {
@@ -50,5 +50,5 @@ export default {
   state,
   mutations,
   actions,
-  getters
+  getters,
 }

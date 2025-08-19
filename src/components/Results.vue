@@ -2,19 +2,24 @@
   <div class="results">
     <div class="results__header">
       <h1>Results</h1>
-
     </div>
     <div>
       <div v-for="value in races" :key="value.id" class="results__round">
-        <h2 class="results__round results__round-title">Round {{ value.programRound }}st Lap - {{ value.distance }}m</h2>
+        <h2 class="results__round results__round-title">
+          Round {{ value.programRound }}st Lap - {{ value.distance }}m
+        </h2>
         <Table
           :headers="headers"
-          :items="value.results.map((r, index) => ({ position: r.position, name: r.horse.name }))"
-          noDataText="No programs available"
+          :items="
+            value?.results?.map((r, index) => ({
+              position: r.position,
+              name: r.horse.name,
+            })) ?? []
+          "
+          noDataText="No results available"
         />
       </div>
     </div>
-
   </div>
 </template>
 
@@ -23,22 +28,22 @@ import { mapState } from 'vuex'
 import Table from './table/Table.vue'
 export default {
   components: {
-    Table
+    Table,
   },
   data() {
     return {
       // results: []
       headers: [
         { text: 'Position', value: 'position', width: '100px' },
-        { text: 'Name', value: 'name' }
-      ]
+        { text: 'Name', value: 'name' },
+      ],
     }
   },
   computed: {
     ...mapState('races', {
-      races: state => state.races
+      races: (state) => state.races,
     }),
-  }
+  },
 }
 </script>
 

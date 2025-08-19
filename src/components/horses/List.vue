@@ -3,11 +3,19 @@
     <div class="horse-list__header">
       <h1>
         Horse List
-        <span v-if="horses.length" class="horse-list__count">(1 - {{ horses.length }})</span>
+        <span v-if="horses.length" class="horse-list__count"
+          >(1 - {{ horses.length }})</span
+        >
       </h1>
-      <button class="btn" @click="fetchRandomHorses(20)">{{ horses.length ? 'Refresh' : 'Load Horses' }}</button>
+      <button class="btn" @click="fetchRandomHorses(20)">
+        {{ horses.length ? 'Refresh' : 'Load Horses' }}
+      </button>
     </div>
-    <Table :headers="headers" :items="horses" noDataText="No horses available"/>
+    <Table
+      :headers="headers"
+      :items="horses"
+      noDataText="No horses available"
+    />
   </div>
 </template>
 
@@ -24,23 +32,23 @@ export default {
       headers: [
         { text: 'Name', value: 'name' },
         { text: 'Condition', value: 'condition' },
-        { text: 'Color', value: 'color' }
-      ]
+        { text: 'Color', value: 'color' },
+      ],
     }
   },
   computed: {
     ...mapState('horses', {
-      horses: state => state.horses,
-      loading: state => state.loading
-    })
+      horses: (state) => state.horses,
+      loading: (state) => state.loading,
+    }),
   },
   methods: {
-    ...mapActions('horses', ['fetchRandomHorses'])
+    ...mapActions('horses', ['fetchRandomHorses']),
   },
 }
 </script>
 
-<style lang="sass" scoped src="../table/index.sass"/>
+<style lang="sass" scoped src="../table/index.sass" />
 <style lang="sass" scoped>
 .horse-list
   min-width: 300px

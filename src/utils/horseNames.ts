@@ -46,7 +46,7 @@ export const horseNames: HorseBase[] = [
   { name: 'Knight', condition: '91', color: 'steel' },
   { name: 'Luna', condition: '80', color: 'violet' },
   { name: 'Orion', condition: '85', color: 'magenta' },
-  { name: 'Quartz', condition: '78', color: 'lemon' }
+  { name: 'Quartz', condition: '78', color: 'lemon' },
 ]
 
 export function pickRandomHorses(count: number): HorseBase[] {

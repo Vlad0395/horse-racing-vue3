@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -7,11 +7,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'HorseRacingView',
     component: () => import('../views/HorseRacingView.vue'),
   },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
-export default router;
+export default router

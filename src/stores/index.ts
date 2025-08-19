@@ -6,5 +6,5 @@ import programs from './modules/programs'
 
 // Root store without generics (simplified)
 export default createStore({
-  modules: { horses, races, bets, programs }
+  modules: { horses, races, bets, programs },
 })

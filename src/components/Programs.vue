@@ -2,21 +2,25 @@
   <div class="program">
     <div class="program__header">
       <h1>Programs</h1>
-
     </div>
     <div>
       <div v-for="value in rounds" :key="value.round" class="program__round">
-        <h2 class="program__round program__round-title">Round {{ value.round }}st Lap - {{ value.distance }}m</h2>
+        <h2 class="program__round program__round-title">
+          Round {{ value.round }}st Lap - {{ value.distance }}m
+        </h2>
         <!-- <p>Distance: {{ value.distance }} meters</p> -->
         <Table
           :headers="headers"
-          :items="value.horses.map((h, index) => ({ position: index + 1, name: h.name }))"
+          :items="
+            value.horses.map((h, index) => ({
+              position: index + 1,
+              name: h.name,
+            }))
+          "
           noDataText="No programs available"
         />
-      
       </div>
     </div>
-
   </div>
 </template>
 
@@ -25,27 +29,24 @@ import { mapState } from 'vuex'
 import Table from './table/Table.vue'
 export default {
   components: {
-    Table
+    Table,
   },
   data() {
     return {
       headers: [
         { text: 'Position', value: 'position', width: '100px' },
-        { text: 'Name', value: 'name' }
-      ]
+        { text: 'Name', value: 'name' },
+      ],
     }
   },
   computed: {
-    ...mapState('programs', ['rounds', 'distances'])
+    ...mapState('programs', ['rounds', 'distances']),
   },
-  methods: {
-    
+  methods: {},
+  mounted() {
+    console.log('rounds :>> ', this.rounds)
+    console.log('distances :>> ', this.distances)
   },
-  mounted () {
-    console.log('rounds :>> ', this.rounds);
-    console.log('distances :>> ', this.distances);
-  }
-
 }
 </script>
 

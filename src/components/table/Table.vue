@@ -3,10 +3,13 @@
     <thead class="table__head">
       <tr class="table__row">
         <th
-          v-for="header in headers" :key="header"
+          v-for="header in headers"
+          :key="header"
           class="table__header"
           :style="{ width: header?.width ?? '100%' }"
-        >{{ header.text }}</th>
+        >
+          {{ header.text }}
+        </th>
       </tr>
     </thead>
     <tbody class="table__body">
@@ -16,7 +19,9 @@
             v-for="header in headers"
             class="table__cell"
             :style="{ width: header?.width ?? '100%' }"
-          >{{ getItemValue(item, header.value) }}</td>
+          >
+            {{ getItemValue(item, header.value) }}
+          </td>
         </tr>
       </template>
       <tr v-else>
@@ -27,23 +32,23 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      headers: { type: Array, required: true },
-      items: { type: Array, required: true },
-      noDataText: { type: String, default: 'No data available' }
-    },
-    methods: {
-      getItemValue(item, header) {
-        // header.value can be a string like 'horse.name'
+export default {
+  props: {
+    headers: { type: Array, required: true },
+    items: { type: Array, required: true },
+    noDataText: { type: String, default: 'No data available' },
+  },
+  methods: {
+    getItemValue(item, header) {
+      // header.value can be a string like 'horse.name'
 
-        if (header.includes('.')) {
-          return header.split('.').reduce((obj, prop) => obj && obj[prop], item);
-        }
-        return item[header];
+      if (header.includes('.')) {
+        return header.split('.').reduce((obj, prop) => obj && obj[prop], item)
       }
-    }
-  }
+      return item[header]
+    },
+  },
+}
 </script>
 
-<style lang="sass" scoped src="./index.sass"/>
+<style lang="sass" scoped src="./index.sass" />

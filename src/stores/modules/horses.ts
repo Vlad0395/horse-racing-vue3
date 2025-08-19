@@ -8,8 +8,12 @@ interface HorsesState {
 const state: HorsesState = { horses: [], loading: false }
 
 const mutations = {
-  setHorses(state: HorsesState, horses: HorseBase[]) { state.horses = horses },
-  setLoading(state: HorsesState, value: boolean) { state.loading = value }
+  setHorses(state: HorsesState, horses: HorseBase[]) {
+    state.horses = horses
+  },
+  setLoading(state: HorsesState, value: boolean) {
+    state.loading = value
+  },
 }
 
 const actions = {
@@ -18,12 +22,12 @@ const actions = {
     const horses = pickRandomHorses(count)
     commit('setHorses', horses)
     commit('setLoading', false)
-  }
+  },
 }
 
 const getters = {
   horses: (state: HorsesState) => state.horses,
-  loading: (state: HorsesState) => state.loading
+  loading: (state: HorsesState) => state.loading,
 }
 
 export default { namespaced: true, state, mutations, actions, getters }

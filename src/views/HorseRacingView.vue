@@ -3,7 +3,7 @@
     <HeaderBar />
     <div class="main__content">
       <HorseList />
-      <div class="main__content-field"> field with horses</div>
+      <Racetrack class="main__content-field" />
       <Programs />
       <Results />
     </div>
@@ -11,10 +11,12 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import HeaderBar from '../components/HeaderBar.vue'
 import HorseList from '../components/horses/List.vue'
 import Programs from '../components/Programs.vue'
 import Results from '../components/Results.vue'
+import Racetrack from '../components/horses/Racetrack.vue'
 
 export default {
   name: 'HorseRacingView',
@@ -22,8 +24,9 @@ export default {
     HeaderBar,
     HorseList,
     Programs,
-    Results
-  }
+    Results,
+    Racetrack,
+  },
 }
 </script>
 
@@ -47,7 +50,4 @@ export default {
     gap: 16px
     &-field
       flex: 1
-    // & > div
-    //   // flex: 1
-    //   margin: 0 10px
 </style>
