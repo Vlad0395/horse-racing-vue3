@@ -4,10 +4,10 @@
       Horse Racing
     </h1>
     <div class="header-buttons">
-      <button class="btn">
+      <button class="btn" @click="generateAll">
         Generate program
       </button>
-      <button class="btn">
+      <button class="btn" @click="runProgramSequence">
         Start/Pause
       </button>
     </div>
@@ -15,8 +15,29 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 export default {
-  name: 'HeaderBar'
+  name: 'HeaderBar',
+  computed: {
+    ...mapState('races', {
+      races: state => state.races
+    })
+  },
+  methods: {
+    ...mapActions('programs', ['generateAll', 'regenerateRound']),
+    ...mapActions('races', ['runProgramSequence'])
+  },
+  watch: {
+    races: {
+      handler(newVal) {
+        // Handle changes to the races state
+        console.log('newVal :>> ', newVal);
+      },
+      deep: true
+    }
+  }
+  
 }
 </script>
 

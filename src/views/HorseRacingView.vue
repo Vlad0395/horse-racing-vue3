@@ -3,7 +3,7 @@
     <HeaderBar />
     <div class="main__content">
       <HorseList />
-      <div> field with horses</div>
+      <div class="main__content-field"> field with horses</div>
       <Programs />
       <Results />
     </div>
@@ -34,8 +34,9 @@ export default {
   align-items: center
   justify-content: space-between
   width: 100%
-  height: 100vh
+  min-height: 100%
   background: #E3E3E3
+  overflow-y: auto
   &__content
     display: flex
     justify-content: space-between
@@ -43,7 +44,10 @@ export default {
     height: 100%
     padding: 20px
     box-sizing: border-box
-    & > div
+    gap: 16px
+    &-field
       flex: 1
-      margin: 0 10px
+    // & > div
+    //   // flex: 1
+    //   margin: 0 10px
 </style>

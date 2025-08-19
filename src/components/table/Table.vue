@@ -5,13 +5,18 @@
         <th
           v-for="header in headers" :key="header"
           class="table__header"
-        >{{ header }}</th>
+          :style="{ width: header?.width ?? '100%' }"
+        >{{ header.text }}</th>
       </tr>
     </thead>
     <tbody class="table__body">
       <template v-if="items.length">
         <tr v-for="item in items" :key="item.id">
-          <td v-for="header in headers" class="table__cell">{{ item[header.toLowerCase()] }}</td>
+          <td
+            v-for="header in headers"
+            class="table__cell"
+            :style="{ width: header?.width ?? '100%' }"
+          >{{ getItemValue(item, header.value) }}</td>
         </tr>
       </template>
       <tr v-else>
@@ -27,6 +32,16 @@
       headers: { type: Array, required: true },
       items: { type: Array, required: true },
       noDataText: { type: String, default: 'No data available' }
+    },
+    methods: {
+      getItemValue(item, header) {
+        // header.value can be a string like 'horse.name'
+
+        if (header.includes('.')) {
+          return header.split('.').reduce((obj, prop) => obj && obj[prop], item);
+        }
+        return item[header];
+      }
     }
   }
 </script>

@@ -13,16 +13,19 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import HorseItem from './Item.vue'
 import horses from '../../stores/modules/horses'
 import Table from '../table/Table.vue'
 
 export default {
   name: 'HorseList',
-  components: { HorseItem, Table },
+  components: { Table },
   data() {
     return {
-      headers: ['Name', 'Condition', 'Color']
+      headers: [
+        { text: 'Name', value: 'name' },
+        { text: 'Condition', value: 'condition' },
+        { text: 'Color', value: 'color' }
+      ]
     }
   },
   computed: {
@@ -34,9 +37,6 @@ export default {
   methods: {
     ...mapActions('horses', ['fetchRandomHorses'])
   },
-  // mounted() {
-  //   this.fetchRandomHorses(20)
-  // }
 }
 </script>
 
