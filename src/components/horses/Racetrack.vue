@@ -30,6 +30,7 @@ import { defineComponent } from 'vue'
 import { mapGetters } from 'vuex'
 import type { HorseBase } from '../../utils/horseNames'
 import Icon from '../Icon.vue'
+import { useRaceAnimation } from '../../composables/useRaceAnimation'
 
 interface Lane {
   number: number
@@ -39,16 +40,13 @@ interface Lane {
 export default defineComponent({
   name: 'Racetrack',
   components: {
-    Icon
+    Icon,
   },
   data() {
     return {
-      progressMap: {} as Record<string, number>,
-      animFrame: 0 as number | null,
       lanesCache: [] as Lane[],
-      showFinishPositions: false,
       postFinishResetDelayMs: 1500,
-      afterReset: false,
+      raceAnim: null as any,
     }
   },
   computed: {
@@ -83,27 +81,39 @@ export default defineComponent({
       return ''
     },
   },
+  created() {
+    this.raceAnim = useRaceAnimation({
+      getActiveRace: () => this.activeRace,
+      getPlanned: () => (this.activeRace ? this.activeRace.planned || [] : []),
+      getHorseKeys: () => this.horsesInRace.map((h) => this.horseKey(h)),
+      getPreviewHorseKeys: () =>
+        this.previewHorses.map((h) => this.horseKey(h)),
+      onFinish: () => {},
+      finishDelayMs: this.postFinishResetDelayMs,
+    })
+    this.buildLanes()
+    this.initProgress()
+  },
   watch: {
-    horsesInRace: {
-      handler() {
-        this.buildLanes()
-        this.initProgress()
-      },
-      immediate: true,
+    horsesInRace() {
+      if (!this.raceAnim) return
+      this.buildLanes()
+      this.initProgress()
     },
     currentRace() {
+      if (!this.raceAnim) return
       this.buildLanes()
       this.initProgress()
     },
     programRounds() {
       if (!this.activeRace) {
+        if (!this.raceAnim) return
         this.buildLanes()
         this.initProgress()
       }
     },
   },
   methods: {
-    // Config values
     startOffset() {
       return 1
     },
@@ -124,74 +134,24 @@ export default defineComponent({
       this.lanesCache = arr
     },
     horseKey(h: HorseBase) {
-      return h.name + '|' + (h.color || '')
+      return `${h.name}|${h.color?.hex ?? h.color ?? ''}`
     },
     initProgress() {
-      this.progressMap = {}
-      this.afterReset = false
-      this.showFinishPositions = false
-      this.horsesInRace.forEach((h) => {
-        this.progressMap[this.horseKey(h)] = 0
-      })
-      this.startAnimation()
-    },
-    startAnimation() {
-      if (this.animFrame) cancelAnimationFrame(this.animFrame)
-      const step = () => {
-        const ar = this.activeRace
-        if (ar && ar.planned && !ar.finishedAt) {
-          const now = performance.now()
-          // store perf start inside race object (non-reactive field)
-          const start = ar._perfStart || (ar._perfStart = now)
-          const elapsed = now - start
-          for (const p of ar.planned) {
-            const key = this.horseKey(p.horse)
-            const pct = Math.min(100, (elapsed / p.timeMs) * 100)
-            this.progressMap[key] = pct
-          }
-        } else {
-          // race finished or no active race
-          if (ar && ar.results && !this.showFinishPositions) {
-            this.showFinishPositions = true
-            setTimeout(
-              () => this.resetToStartPositions(),
-              this.postFinishResetDelayMs
-            )
-          }
-          if (!this.activeRace) {
-            // preview only: ensure preview horses sit at start
-            this.previewHorses.forEach((h) => {
-              this.progressMap[this.horseKey(h)] = 0
-            })
-          }
-          this.animFrame = null
-          return
-        }
-        this.animFrame = requestAnimationFrame(step)
-      }
-      this.animFrame = requestAnimationFrame(step)
-    },
-    resetToStartPositions() {
-      this.afterReset = true
-      this.showFinishPositions = false
-      if (!this.activeRace && this.previewHorses.length) {
-        this.previewHorses.forEach((h) => {
-          this.progressMap[this.horseKey(h)] = 0
-        })
-      }
+      this.raceAnim.init()
     },
     horsePosition(h: HorseBase) {
       const key = this.horseKey(h)
-      const val = this.progressMap[key]
+      const val = this.raceAnim.progressMap[key]
       const ar = this.activeRace
       if (ar && ar.results) {
-        const res = ar.results.find((r: any) => r.horse.name === h.name)
-        if (res && this.showFinishPositions) {
+        const res = ar.results.find((r) => r.horse.name === h.name)
+        if (res && this.raceAnim?.showFinishPositions) {
           return (
             this.finishClusterBase() -
             (res.position - 1) * this.finishClusterGap()
           )
-        } else if (res && !this.showFinishPositions) return this.startOffset()
+        } else if (res && !this.raceAnim?.showFinishPositions)
+          return this.startOffset()
       }
       if (val == null) return this.startOffset()
       const from = this.startOffset()
@@ -204,7 +164,7 @@ export default defineComponent({
     },
   },
   unmounted() {
-    if (this.animFrame) cancelAnimationFrame(this.animFrame)
+    this.raceAnim?.stop()
   },
 })
 </script>
