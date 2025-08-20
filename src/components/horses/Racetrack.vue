@@ -25,9 +25,9 @@
 </template>
 
 <script lang="ts">
-// @ts-nocheck
+//@ts-nocheck
 import { defineComponent } from 'vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import type { HorseBase } from '../../utils/horseNames'
 import Icon from '../Icon.vue'
 import { useRaceAnimation } from '../../composables/useRaceAnimation'
@@ -36,7 +36,6 @@ interface Lane {
   number: number
   horse?: HorseBase
 }
-
 export default defineComponent({
   name: 'Racetrack',
   components: {
@@ -44,15 +43,23 @@ export default defineComponent({
   },
   data() {
     return {
-      lanesCache: [] as Lane[],
       postFinishResetDelayMs: 1500,
       raceAnim: null as any,
+      animParams: {
+        startOffset: 1,
+        liveFinish: 95,
+        finishClusterBase: 100,
+        finishClusterGap: 1,
+      },
     }
   },
   computed: {
     ...mapGetters({
       currentRace: 'races/current',
       programRounds: 'programs/rounds',
+    }),
+    ...mapState('programs', {
+      totalHorsesPerRound: (state) => state.totalHorsesPerRound,
     }),
     activeRace() {
       return this.currentRace || null
@@ -69,7 +76,10 @@ export default defineComponent({
       return this.previewHorses
     },
     lanes(): Lane[] {
-      return this.lanesCache
+      return Array.from({ length: this.totalHorsesPerRound }, (_, i) => ({
+        number: i + 1,
+        horse: this.horsesInRace[i],
+      }))
     },
     lapLabel(): string {
       if (this.activeRace)
@@ -91,48 +101,25 @@ export default defineComponent({
       onFinish: () => {},
       finishDelayMs: this.postFinishResetDelayMs,
     })
-    this.buildLanes()
     this.initProgress()
   },
   watch: {
     horsesInRace() {
       if (!this.raceAnim) return
-      this.buildLanes()
       this.initProgress()
     },
     currentRace() {
       if (!this.raceAnim) return
-      this.buildLanes()
       this.initProgress()
     },
     programRounds() {
       if (!this.activeRace) {
         if (!this.raceAnim) return
-        this.buildLanes()
         this.initProgress()
       }
     },
   },
   methods: {
-    startOffset() {
-      return 1
-    },
-    liveFinish() {
-      return 95
-    },
-    finishClusterBase() {
-      return 100
-    },
-    finishClusterGap() {
-      return 1
-    },
-
-    buildLanes() {
-      const arr: Lane[] = []
-      for (let i = 0; i < 10; i++)
-        arr.push({ number: i + 1, horse: this.horsesInRace[i] })
-      this.lanesCache = arr
-    },
     horseKey(h: HorseBase) {
       return `${h.name}|${h.color?.hex ?? h.color ?? ''}`
     },
@@ -147,10 +134,10 @@ export default defineComponent({
         },
         this.raceAnim.progressMap,
         this.raceAnim.showFinishPositions,
-        this.startOffset(),
-        this.liveFinish(),
-        this.finishClusterBase(),
-        this.finishClusterGap()
+        this.animParams.startOffset,
+        this.animParams.liveFinish,
+        this.animParams.finishClusterBase,
+        this.animParams.finishClusterGap
       )
       return { left: `${x}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
