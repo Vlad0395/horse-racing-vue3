@@ -7,9 +7,6 @@
           >(1 - {{ horses.length }})</span
         >
       </h1>
-      <button class="btn" @click="fetchRandomHorses(20)">
-        {{ horses.length ? 'Refresh' : 'Load Horses' }}
-      </button>
     </div>
     <Table
       :headers="headers"
@@ -20,7 +17,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 import horses from '../../stores/modules/horses'
 import Table from '../table/Table.vue'
 
@@ -41,9 +38,6 @@ export default {
       horses: (state) => state.horses,
       loading: (state) => state.loading,
     }),
-  },
-  methods: {
-    ...mapActions('horses', ['fetchRandomHorses']),
   },
 }
 </script>

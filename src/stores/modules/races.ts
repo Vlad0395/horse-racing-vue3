@@ -131,6 +131,14 @@ const mutations = {
   setRaceDuration(state: RacesState, ms: number) {
     state.raceDurationMs = ms
   },
+  clear(state: RacesState) {
+    state.races = []
+    state.currentRaceId = null
+    state.active = false
+    state.sequenceRunning = false
+    state.currentRoundIndex = null
+    state.sequenceTimerId = null
+  },
 }
 
 const actions = {
@@ -203,6 +211,9 @@ const actions = {
       commit('setSequenceTimer', timer as unknown as number)
     }
     setTimeout(finalize, duration)
+  },
+  resetAll({ commit }: any) {
+    commit('clear')
   },
 }
 

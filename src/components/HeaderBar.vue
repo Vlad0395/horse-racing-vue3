@@ -2,8 +2,18 @@
   <header class="header-bar">
     <h1 class="header-title">Horse Racing</h1>
     <div class="header-buttons">
-      <button class="btn" @click="generateAll">Generate program</button>
-      <button class="btn" @click="runProgramSequence">Start/Pause</button>
+      <button class="btn" :disabled="active" @click="generateAll">Generate program</button>
+      <button v-if="active" class="btn" @click="cancelProgramSequence">
+        Cancel
+      </button>
+      <button
+        v-else
+        class="btn"
+        :disabled="!rounds.length"
+        @click="runProgramSequence"
+      >
+        Start
+      </button>
     </div>
   </header>
 </template>
@@ -16,20 +26,15 @@ export default {
   computed: {
     ...mapState('races', {
       races: (state) => state.races,
+      active: (state) => state.active,
+    }),
+    ...mapState('programs', {
+      rounds: (state) => state.rounds,
     }),
   },
   methods: {
-    ...mapActions('programs', ['generateAll', 'regenerateRound']),
-    ...mapActions('races', ['runProgramSequence']),
-  },
-  watch: {
-    races: {
-      handler(newVal) {
-        // Handle changes to the races state
-        console.log('newVal :>> ', newVal)
-      },
-      deep: true,
-    },
+    ...mapActions('programs', ['generateAll']),
+    ...mapActions('races', ['runProgramSequence', 'cancelProgramSequence']),
   },
 }
 </script>
