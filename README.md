@@ -1,5 +1,35 @@
-# Vue 3 + TypeScript + Vite
+# 🏇 Horse Racing
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This project simulates horse racing. You can run races, add horses, view results, and analyze statistics.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 🚀 Getting Started
+
+1. Clone the repository:
+  ```
+  git clone https://github.com/Vlad95/horse-racing.git
+  ```
+2. Navigate to the project directory:
+  ```
+  cd horse-racing
+  ```
+3. Read the documentation and follow the instructions to launch the application.
+
+## 📦 Features
+
+- Add and edit horses
+- Run races
+- Display results
+- Statistics and analytics
+
+## 🛠️ Technologies
+
+- Vue / Vuex / JavaScript / HTML / SASS
+- Web interface
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Made with ❤️ for horse racing fans!
