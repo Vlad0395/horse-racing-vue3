@@ -139,27 +139,19 @@ export default defineComponent({
     initProgress() {
       this.raceAnim.init()
     },
-    horsePosition(h: HorseBase) {
-      const key = this.horseKey(h)
-      const val = this.raceAnim.progressMap[key]
-      const ar = this.activeRace
-      if (ar && ar.results) {
-        const res = ar.results.find((r) => r.horse.name === h.name)
-        if (res && this.raceAnim?.showFinishPositions) {
-          return (
-            this.finishClusterBase() -
-            (res.position - 1) * this.finishClusterGap()
-          )
-        } else if (res && !this.raceAnim?.showFinishPositions)
-          return this.startOffset()
-      }
-      if (val == null) return this.startOffset()
-      const from = this.startOffset()
-      const to = this.liveFinish()
-      return from + (to - from) * (Math.min(100, Math.max(0, val)) / 100)
-    },
     horseStyle(h: HorseBase) {
-      const x = this.horsePosition(h)
+      const x = this.raceAnim.getHorsePosition(
+        h,
+        {
+          getActiveRace: () => this.activeRace,
+        },
+        this.raceAnim.progressMap,
+        this.raceAnim.showFinishPositions,
+        this.startOffset(),
+        this.liveFinish(),
+        this.finishClusterBase(),
+        this.finishClusterGap()
+      )
       return { left: `${x}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
   },

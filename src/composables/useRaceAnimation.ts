@@ -97,6 +97,34 @@ export function useRaceAnimation(opts: UseRaceAnimationOptions) {
       resetTimeout = null
     }
   }
+
+  function getHorsePosition(
+    h: any,
+    opts: UseRaceAnimationOptions,
+    progressMap: Record<string, number>,
+    showFinishPositions: boolean,
+    startOffset = 1,
+    liveFinish = 95,
+    finishClusterBase = 100,
+    finishClusterGap = 1
+  ) {
+    const key = `${h.name}|${h.color?.hex ?? h.color ?? ''}`
+    const val = progressMap[key]
+    const ar = opts.getActiveRace()
+    if (ar && ar.results) {
+      const res = ar.results.find((r: any) => r.horse.name === h.name)
+      if (res && showFinishPositions) {
+        return finishClusterBase - (res.position - 1) * finishClusterGap
+      } else if (res && !showFinishPositions) {
+        return startOffset
+      }
+    }
+    if (val == null) return startOffset
+    const from = startOffset
+    const to = liveFinish
+    return from + (to - from) * (Math.min(100, Math.max(0, val)) / 100)
+  }
+
   onBeforeUnmount(stop)
 
   return {
@@ -108,5 +136,6 @@ export function useRaceAnimation(opts: UseRaceAnimationOptions) {
     init,
     stop,
     resetToStartPositions,
+    getHorsePosition,
   }
 }
