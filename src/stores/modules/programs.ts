@@ -5,7 +5,7 @@ import type { HorseBase } from '../../utils'
 interface ProgramRound {
   round: number
   distance: number // meters
-  horses: { name: string; condition: string; color: string }[]
+  horses: HorseBase[]
   generatedAt: number
 }
 
@@ -17,8 +17,8 @@ interface ProgramsState {
 
 const state: ProgramsState = {
   rounds: [],
-  distances: [1200, 1400],
-  // distances: [1200, 1400, 1600, 1800, 2000, 2200],
+  // distances: [1200],
+  distances: [1200, 1400, 1600, 1800, 2000, 2200],
   totalHorsesPerRound: 10,
 }
 
@@ -37,7 +37,7 @@ const mutations = {
 function pickRandomExcluding(
   exclude: Set<string>,
   count: number,
-  available: { name: string; condition: string; color: string }[]
+  available:  HorseBase[]
 ) {
   const pool = available.filter((h) => !exclude.has(h.name + '|' + h.color))
   let source = pool

@@ -32,7 +32,7 @@ export default {
       headers: [
         { text: 'Name', value: 'name' },
         { text: 'Condition', value: 'condition' },
-        { text: 'Color', value: 'color' },
+        { text: 'Color', value: 'color.name' },
       ],
     }
   },

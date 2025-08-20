@@ -140,9 +140,7 @@ const actions = {
   },
   runProgramSequence({ state, commit, dispatch, rootGetters }: any) {
     const rounds = rootGetters['programs/rounds']
-    console.log('rounds', rounds)
     if (!rounds || !rounds.length) {
-      // try auto-generate if module present
       if (dispatch) {
         dispatch('programs/generateAll', null, { root: true })
       }

@@ -2,17 +2,17 @@
   <div class="racetrack">
     <div class="racetrack__finish-line" />
     <div class="racetrack__lanes">
-      <div v-for="lane in lanesForView" :key="lane.number" class="lane">
+      <div v-for="lane in lanes" :key="lane.number" class="lane">
         <div class="lane__number">{{ lane.number }}</div>
         <div class="lane__track">
           <div
             v-if="lane.horse"
             class="horse"
-            :style="{ left: horsePosition(lane.horse) + '%' }"
+            :style="horseStyle(lane.horse)"
             :title="lane.horse.name + ' (cond ' + lane.horse.condition + ')'"
           >
-            <span class="horse__icon">🐎</span>
-            <span class="horse__label">{{ lane.horse.name }}</span>
+            <!-- <span class="horse__icon">🐎</span> -->
+            <Icon name="horse" size="90" :color="lane.horse.color.hex" />
           </div>
         </div>
       </div>
@@ -28,190 +28,183 @@
 // @ts-nocheck
 import { defineComponent } from 'vue'
 import { mapGetters } from 'vuex'
+import type { HorseBase } from '../../utils/horseNames'
+import Icon from '../Icon.vue'
 
-interface HorseLike {
-  name: string
-  condition?: string | number
-  color?: string
-}
 interface Lane {
   number: number
-  horse?: HorseLike
+  horse?: HorseBase
 }
 
 export default defineComponent({
   name: 'Racetrack',
-  computed: {
-    ...mapGetters({
-      races: 'races/races',
-      currentRace: 'races/current',
-      sequenceRunning: 'races/sequenceRunning',
-    }),
-    activeRace(): any | null {
-      // prefer current active else last finished
-      // @ts-ignore
-      if (this.currentRace) return this.currentRace
-      // @ts-ignore
-      const list = this.races as any[]
-      return list.length ? list[list.length - 1] : null
-    },
-    horsesInRace(): HorseLike[] {
-      const ar: any = this.activeRace
-      return ar && Array.isArray(ar.horses)
-        ? (ar.horses as HorseLike[])
-        : ([] as HorseLike[])
-    },
-    lanes(): Lane[] {
-      const arr: Lane[] = []
-      for (let i = 0; i < 10; i++) {
-        const list = this.horsesInRace as unknown as HorseLike[]
-        arr.push({ number: i + 1, horse: list[i] })
-      }
-      return arr
-    },
-    lanesForView(): any[] {
-      return this.lanes as any[]
-    },
-    lapLabel(): string {
-      const ar: any = this.activeRace
-      if (!ar) return ''
-      const lap = ar.programRound || 1
-      const distance = ar.distance || 1200
-      return `${lap}.st Lap ${distance}m`
-    },
+  components: {
+    Icon
   },
   data() {
     return {
       progressMap: {} as Record<string, number>,
-      animTimer: 0 as any,
+      animFrame: 0 as number | null,
+      lanesCache: [] as Lane[],
       showFinishPositions: false,
-      postFinishResetDelayMs: 2000,
+      postFinishResetDelayMs: 1500,
       afterReset: false,
     }
+  },
+  computed: {
+    ...mapGetters({
+      currentRace: 'races/current',
+      programRounds: 'programs/rounds',
+    }),
+    activeRace() {
+      return this.currentRace || null
+    },
+    previewHorses(): HorseBase[] {
+      if (this.activeRace) return []
+      if (this.programRounds && this.programRounds.length)
+        return this.programRounds[0].horses || []
+      return []
+    },
+    horsesInRace(): HorseBase[] {
+      if (this.activeRace && Array.isArray(this.activeRace.horses))
+        return this.activeRace.horses
+      return this.previewHorses
+    },
+    lanes(): Lane[] {
+      return this.lanesCache
+    },
+    lapLabel(): string {
+      if (this.activeRace)
+        return `${this.activeRace.programRound || 1}.st Lap ${this.activeRace.distance || 1200}m`
+      if (this.programRounds && this.programRounds.length) {
+        const first = this.programRounds[0]
+        return `${first.round}.st Lap ${first.distance}m`
+      }
+      return ''
+    },
   },
   watch: {
     horsesInRace: {
       handler() {
+        this.buildLanes()
         this.initProgress()
       },
       immediate: true,
     },
     currentRace() {
+      this.buildLanes()
       this.initProgress()
+    },
+    programRounds() {
+      if (!this.activeRace) {
+        this.buildLanes()
+        this.initProgress()
+      }
     },
   },
   methods: {
-    // Positioning configuration
-    startOffset(): number {
+    // Config values
+    startOffset() {
       return 1
-    }, // лівий край іконки стартує трохи правіше номерів
-    liveFinish(): number {
-      return 100.8
-    }, // максимальна жива позиція (достатньо щоб хвіст перетнув лінію)
-    finishClusterBase(): number {
-      return 101.4
-    }, // де зупиняється переможець (одразу за лінією)
-    finishClusterGap(): number {
-      return 0.9
+    },
+    liveFinish() {
+      return 95
+    },
+    finishClusterBase() {
+      return 100
+    },
+    finishClusterGap() {
+      return 1
+    },
+
+    buildLanes() {
+      const arr: Lane[] = []
+      for (let i = 0; i < 10; i++)
+        arr.push({ number: i + 1, horse: this.horsesInRace[i] })
+      this.lanesCache = arr
+    },
+    horseKey(h: HorseBase) {
+      return h.name + '|' + (h.color || '')
     },
     initProgress() {
-      // reset for a new race
       this.progressMap = {}
-      this.showFinishPositions = false
       this.afterReset = false
-      ;(this.horsesInRace as unknown as HorseLike[]).forEach((h: HorseLike) => {
-        const key = this.horseKey(h)
-        this.progressMap[key] = Math.random() * 10 // start region
+      this.showFinishPositions = false
+      this.horsesInRace.forEach((h) => {
+        this.progressMap[this.horseKey(h)] = 0
       })
       this.startAnimation()
     },
     startAnimation() {
-      if (this.animTimer) cancelAnimationFrame(this.animTimer)
+      if (this.animFrame) cancelAnimationFrame(this.animFrame)
       const step = () => {
-        const ar: any = this.activeRace
-        const now = performance.now()
-        let raceStart = 0
-        if (ar) {
-          raceStart = ar.startedAtPerf || ar._perfStart || (ar._perfStart = now)
-          if (!ar.startedAtPerf) ar.startedAtPerf = raceStart
-          if (ar.planned && ar.planned.length) {
-            // precomputed max time available in ar.simMaxTimeMs if needed for future display
+        const ar = this.activeRace
+        if (ar && ar.planned && !ar.finishedAt) {
+          const now = performance.now()
+          // store perf start inside race object (non-reactive field)
+          const start = ar._perfStart || (ar._perfStart = now)
+          const elapsed = now - start
+          for (const p of ar.planned) {
+            const key = this.horseKey(p.horse)
+            const pct = Math.min(100, (elapsed / p.timeMs) * 100)
+            this.progressMap[key] = pct
           }
-        }
-        const elapsed = ar ? now - raceStart : 0
-        ;(this.horsesInRace as unknown as HorseLike[]).forEach(
-          (h: HorseLike) => {
-            const key = this.horseKey(h)
-            // If we have planned times, progress = elapsed / horseTime
-            let progress = this.progressMap[key] || 0
-            if (ar && ar.planned) {
-              const planned = ar.planned.find(
-                (p: any) => p.horse.name === h.name
-              )
-              if (planned && planned.timeMs) {
-                progress = Math.min(100, (elapsed / planned.timeMs) * 100)
-              }
-            } else {
-              // fallback simple growth
-              progress = Math.min(100, progress + 0.4)
-            }
-            this.progressMap[key] = progress
+        } else {
+          // race finished or no active race
+          if (ar && ar.results && !this.showFinishPositions) {
+            this.showFinishPositions = true
+            setTimeout(
+              () => this.resetToStartPositions(),
+              this.postFinishResetDelayMs
+            )
           }
-        )
-        // Detect finish -> show final clustering once
-        if (
-          ar &&
-          ar.finishedAt &&
-          !this.showFinishPositions &&
-          !this.afterReset
-        ) {
-          this.showFinishPositions = true
-          // schedule reset back to start after delay
-          setTimeout(() => {
-            this.resetToStartPositions()
-          }, this.postFinishResetDelayMs)
+          if (!this.activeRace) {
+            // preview only: ensure preview horses sit at start
+            this.previewHorses.forEach((h) => {
+              this.progressMap[this.horseKey(h)] = 0
+            })
+          }
+          this.animFrame = null
+          return
         }
-        this.animTimer = requestAnimationFrame(step)
+        this.animFrame = requestAnimationFrame(step)
       }
-      this.animTimer = requestAnimationFrame(step)
+      this.animFrame = requestAnimationFrame(step)
     },
     resetToStartPositions() {
       this.afterReset = true
       this.showFinishPositions = false
-      Object.keys(this.progressMap).forEach((k) => {
-        this.progressMap[k] = 0
-      })
-      if (this.animTimer) cancelAnimationFrame(this.animTimer)
+      if (!this.activeRace && this.previewHorses.length) {
+        this.previewHorses.forEach((h) => {
+          this.progressMap[this.horseKey(h)] = 0
+        })
+      }
     },
-    horseKey(h: HorseLike) {
-      return h.name + '|' + (h.color || '')
-    },
-    horsePosition(h: HorseLike): number {
+    horsePosition(h: HorseBase) {
       const key = this.horseKey(h)
       const val = this.progressMap[key]
-      const ar: any = this.activeRace
+      const ar = this.activeRace
       if (ar && ar.results) {
-        const result = ar.results.find((r: any) => r.horse.name === h.name)
-        if (result && this.showFinishPositions) {
-          // Map positions to cluster beyond finish line
+        const res = ar.results.find((r: any) => r.horse.name === h.name)
+        if (res && this.showFinishPositions) {
           return (
             this.finishClusterBase() -
-            (result.position - 1) * this.finishClusterGap()
+            (res.position - 1) * this.finishClusterGap()
           )
-        } else if (result && !this.showFinishPositions) {
-          // race finished but already reset => stay at start
-          return 0
-        }
+        } else if (res && !this.showFinishPositions) return this.startOffset()
       }
-      if (val == null) return 0
-      // Лайв рух: 0..100 -> startOffset .. liveFinish
+      if (val == null) return this.startOffset()
       const from = this.startOffset()
       const to = this.liveFinish()
-      return from + (to - from) * (Math.min(100, val) / 100)
+      return from + (to - from) * (Math.min(100, Math.max(0, val)) / 100)
+    },
+    horseStyle(h: HorseBase) {
+      const x = this.horsePosition(h)
+      return { left: `${x}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
   },
   unmounted() {
-    if (this.animTimer) cancelAnimationFrame(this.animTimer)
+    if (this.animFrame) cancelAnimationFrame(this.animFrame)
   },
 })
 </script>
@@ -282,19 +275,19 @@ export default defineComponent({
 .horse
   position: absolute
   top: 50%
-  transform: translate(0, -50%)
+  left: 0
+  transform: translateY(-50%) scaleX(-1)
+  will-change: left
   display: flex
   flex-direction: column
   align-items: center
-  transition: left .4s linear
   pointer-events: none
   &__icon
-    font-size: 48px
+    font-size: 40px
     line-height: 1
     filter: grayscale(1)
-    transform: scaleX(-1)
   &__label
-    font-size: 18px
+    font-size: 12px
     color: #222
     padding: 1px 4px
     border-radius: 3px
