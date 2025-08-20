@@ -2,7 +2,7 @@
   <div class="racetrack">
     <div class="racetrack__finish-line" />
     <div class="racetrack__lanes">
-      <div v-for="lane in lanes" :key="lane.number" class="lane">
+      <div v-for="lane in lanes as Lane[]" :key="lane.number" class="lane">
         <div class="lane__number">{{ lane.number }}</div>
         <div class="lane__track">
           <div
@@ -11,8 +11,8 @@
             :style="horseStyle(lane.horse)"
             :title="lane.horse.name + ' (cond ' + lane.horse.condition + ')'"
           >
-            <!-- <span class="horse__icon">🐎</span> -->
-            <Icon name="horse" size="90" :color="lane.horse.color.hex" />
+          <Icon size="90" :color="lane.horse.color.hex" />
+          <span class="horse__label">{{ lane.horse.name }}</span>
           </div>
         </div>
       </div>
@@ -25,12 +25,13 @@
 </template>
 
 <script lang="ts">
-//@ts-nocheck
 import { defineComponent } from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import type { HorseBase } from '../../utils/horseNames'
-import Icon from '../Icon.vue'
+import Icon from '../IconHorse.vue'
 import { useRaceAnimation } from '../../composables/useRaceAnimation'
+import type { ProgramRound } from '../../stores/modules/programs'
+import type { Race } from '../../stores/modules/races'
 
 interface Lane {
   number: number
@@ -44,7 +45,7 @@ export default defineComponent({
   data() {
     return {
       postFinishResetDelayMs: 1500,
-      raceAnim: null as any,
+      raceAnim: null as ReturnType<typeof useRaceAnimation> | null,
       animParams: {
         startOffset: 1,
         liveFinish: 95,
@@ -56,48 +57,54 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       currentRace: 'races/current',
-      programRounds: 'programs/rounds',
     }),
     ...mapState('programs', {
-      totalHorsesPerRound: (state) => state.totalHorsesPerRound,
+      totalHorsesPerRound: (state: { totalHorsesPerRound: number }) =>
+        state.totalHorsesPerRound,
+      programRounds: (state: { rounds: ProgramRound[] }): ProgramRound[] =>
+        state.rounds,
     }),
-    activeRace() {
-      return this.currentRace || null
+    activeRace(): Race | null {
+      return (this.currentRace as Race) || null
     },
     previewHorses(): HorseBase[] {
       if (this.activeRace) return []
-      if (this.programRounds && this.programRounds.length)
-        return this.programRounds[0].horses || []
+      if (this.programRounds && (this.programRounds as ProgramRound[]).length)
+        return (this.programRounds as ProgramRound[])[0].horses || []
       return []
     },
     horsesInRace(): HorseBase[] {
-      if (this.activeRace && Array.isArray(this.activeRace.horses))
-        return this.activeRace.horses
-      return this.previewHorses
+      if (this.activeRace && Array.isArray((this.activeRace as Race).horses))
+        return (this.activeRace as Race).horses
+      return this.previewHorses as HorseBase[]
     },
     lanes(): Lane[] {
-      return Array.from({ length: this.totalHorsesPerRound }, (_, i) => ({
+      const horses: HorseBase[] = this.horsesInRace as HorseBase[]
+      return Array.from(Array(this.totalHorsesPerRound), (_, i) => ({
         number: i + 1,
-        horse: this.horsesInRace[i],
+        horse: horses[i],
       }))
     },
     lapLabel(): string {
       if (this.activeRace)
-        return `${this.activeRace.programRound || 1}.st Lap ${this.activeRace.distance || 1200}m`
-      if (this.programRounds && this.programRounds.length) {
-        const first = this.programRounds[0]
+        return `${(this.activeRace as Race).programRound || 1}.st Lap ${(this.activeRace as Race).distance || 1200}m`
+      if (this.programRounds && (this.programRounds as ProgramRound[]).length) {
+        const first = (this.programRounds as ProgramRound[])[0]
         return `${first.round}.st Lap ${first.distance}m`
       }
       return ''
     },
   },
   created() {
+    // @ts-ignore
     this.raceAnim = useRaceAnimation({
       getActiveRace: () => this.activeRace,
-      getPlanned: () => (this.activeRace ? this.activeRace.planned || [] : []),
-      getHorseKeys: () => this.horsesInRace.map((h) => this.horseKey(h)),
+      getPlanned: () =>
+        this.activeRace ? (this.activeRace as Race).planned || [] : [],
+      getHorseKeys: () =>
+        (this.horsesInRace as HorseBase[]).map((h) => this.horseKey(h)),
       getPreviewHorseKeys: () =>
-        this.previewHorses.map((h) => this.horseKey(h)),
+        (this.previewHorses as HorseBase[]).map((h) => this.horseKey(h)),
       onFinish: () => {},
       finishDelayMs: this.postFinishResetDelayMs,
     })
@@ -124,13 +131,19 @@ export default defineComponent({
       return `${h.name}|${h.color?.hex ?? h.color ?? ''}`
     },
     initProgress() {
+      if (!this.raceAnim) return
       this.raceAnim.init()
     },
     horseStyle(h: HorseBase) {
+      if (!this.raceAnim) return
       const x = this.raceAnim.getHorsePosition(
         h,
         {
           getActiveRace: () => this.activeRace,
+          getPlanned: () =>
+            this.activeRace ? (this.activeRace as Race).planned || [] : [],
+          getHorseKeys: () =>
+            (this.horsesInRace as HorseBase[]).map((h) => this.horseKey(h)),
         },
         this.raceAnim.progressMap,
         this.raceAnim.showFinishPositions,
@@ -226,6 +239,7 @@ export default defineComponent({
     line-height: 1
     filter: grayscale(1)
   &__label
+    transform: translateY(-50%) scaleX(-1)
     font-size: 12px
     color: #222
     padding: 1px 4px

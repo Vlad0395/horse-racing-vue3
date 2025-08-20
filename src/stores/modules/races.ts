@@ -1,33 +1,32 @@
-interface Race {
+import type { HorseBase } from '../../utils'
+
+export interface Race {
   id: number
   startedAt: number
   finishedAt?: number
   programRound?: number
-  distance?: number
-  horses?: any[]
+  distance: number
+  horses: HorseBase[]
   results?: RaceResult[]
   planned?: RaceResult[] // precomputed order & times (used during animation)
   simMaxTimeMs?: number // longest horse time used for scheduling
 }
 
 interface RaceResult {
-  horse: any
+  horse: HorseBase
   position: number
   timeMs?: number
 }
 
 // Helper: compute race results based on horse condition (higher condition => better expected performance)
 function computeResultsByCondition(
-  horses: any[] = [],
+  horses: HorseBase[] = [],
   distance?: number
 ): RaceResult[] {
   if (!horses.length) return []
   // Parse numeric condition (fallback 50) and keep original ref
   const enriched = horses.map((h) => {
-    const cRaw = (h && (h.condition ?? h.conditional ?? h.power)) as
-      | string
-      | number
-      | undefined
+    const cRaw = h && h.condition
     const c = typeof cRaw === 'number' ? cRaw : parseFloat(String(cRaw || '0'))
     return { ref: h, condition: isFinite(c) ? c : 50 }
   })
@@ -84,7 +83,13 @@ const mutations = {
     const id = state.races.length
       ? state.races[state.races.length - 1].id + 1
       : 1
-    const race: Race = { id, startedAt: Date.now(), ...payload }
+    const race: Race = {
+      id,
+      startedAt: Date.now(),
+      ...payload,
+      horses: payload?.horses ?? [],
+      distance: payload?.distance ?? 1200, // default to 1200 if undefined
+    }
     // Precompute planned results (times + positions) for animation if horses provided.
     if (race.horses && race.horses.length) {
       const planned = computeResultsByCondition(

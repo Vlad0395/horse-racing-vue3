@@ -2,7 +2,7 @@
 
 import type { HorseBase } from '../../utils'
 
-interface ProgramRound {
+export interface ProgramRound {
   round: number
   distance: number // meters
   horses: HorseBase[]
