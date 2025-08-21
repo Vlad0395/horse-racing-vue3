@@ -54,7 +54,7 @@ export default {
 
 <style lang="sass" scoped>
 .results
-  height: calc(100vh - 100px)
+  height: calc(100vh - 120px)
   &__header
     background: #f5f5f5
     border-bottom: 1px solid #e0e0e0

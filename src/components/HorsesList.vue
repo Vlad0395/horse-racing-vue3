@@ -1,5 +1,5 @@
 <template>
-  <div class="horse-list min-w-300">
+  <div class="horse-list min-w-300 overflow-y-auto">
     <div
       class="horse-list__header d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
     >
@@ -47,6 +47,7 @@ export default {
 <style lang="sass" scoped src="./table/index.sass" />
 <style lang="sass" scoped>
 .horse-list
+  height: calc( 100vh - 120px )
   &__count
     color: #666
   &__header

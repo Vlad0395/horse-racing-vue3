@@ -1,6 +1,6 @@
 <template>
-  <div class="racetrack">
-    <div class="racetrack__finish-line" />
+  <div class="racetrack" ref="racetrackRef">
+    <div class="racetrack__finish-line" ref="finishLineRef" />
     <div class="racetrack__lanes">
       <div v-for="lane in lanes as Lane[]" :key="lane.number" class="lane">
         <div class="lane__number">{{ lane.number }}</div>
@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import type { HorseBase } from '../utils/horseNames'
 import Icon from './IconHorse.vue'
@@ -52,6 +52,8 @@ export default defineComponent({
         finishClusterBase: 100,
         finishClusterGap: 1,
       },
+      finishPercent: 94.5, // позиція фінішу у %
+      resizeHandler: null,
     }
   },
   computed: {
@@ -110,6 +112,21 @@ export default defineComponent({
     })
     this.initProgress()
   },
+  mounted() {
+    nextTick(() => {
+      this.calcFinishPercent()
+      //@ts-ignore
+      this.resizeHandler = () => this.calcFinishPercent()
+      //@ts-ignore
+      window.addEventListener('resize', this.resizeHandler)
+    })
+  },
+  beforeUnmount() {
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler)
+    }
+    if (this.raceAnim) this.raceAnim.stop()
+  },
   watch: {
     horsesInRace() {
       if (!this.raceAnim) return
@@ -152,7 +169,24 @@ export default defineComponent({
         this.animParams.finishClusterBase,
         this.animParams.finishClusterGap
       )
-      return { left: `${x}%`, transform: 'translateY(-50%) scaleX(-1)' }
+      // Обмеження: кінь не переходить фінішну лінію
+      const left = Math.min(x, this.animParams.liveFinish)
+      return { left: `${left}%`, transform: 'translateY(-50%) scaleX(-1)' }
+    },
+
+    calcFinishPercent() {
+      // Розрахунок позиції фінішу у %
+      const track = this.$refs.racetrackRef as HTMLElement | undefined
+      const finish = this.$refs.finishLineRef as HTMLElement | undefined
+      if (track && finish) {
+        const trackRect = track.getBoundingClientRect()
+        const finishRect = finish.getBoundingClientRect()
+        const finishRight = finishRect.right - trackRect.left
+        const percent =
+          ((finishRight - finishRect.width / 2) / trackRect.width) * 100
+        this.finishPercent = percent
+        this.animParams.liveFinish = percent
+      }
     },
   },
   unmounted() {

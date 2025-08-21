@@ -52,7 +52,7 @@ export default {
 
 <style lang="sass" scoped>
 .program
-  height: calc(100vh - 100px)
+  height: calc(100vh - 120px)
   width: 'max-content'
   &__round
     background: #fecaca

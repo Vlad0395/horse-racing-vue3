@@ -73,7 +73,7 @@ export default {
   overflow-y: auto
   &__content
     height: 100%
-    min-height: 100vh
+    min-height: calc(100vh - 100px)
     box-sizing: border-box
 
     &-field
