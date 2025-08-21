@@ -186,6 +186,7 @@ export default defineComponent({
           ((finishRight - finishRect.width / 2) / trackRect.width) * 100
         this.finishPercent = percent
         this.animParams.liveFinish = percent
+        console.log('this.animParams.liveFinish', this.animParams.liveFinish)
       }
     },
   },

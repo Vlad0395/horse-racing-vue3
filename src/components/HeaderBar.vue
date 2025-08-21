@@ -6,7 +6,7 @@
     <div class="header-buttons d-flex items-center gap-3">
       <button
         class="btn bg-primary border-radius-1 border-none px-4 py-2 text-white"
-        :disabled="active"
+        :disabled="active || races.length !== 6"
         @click="generateAll"
       >
         Generate program
@@ -21,7 +21,7 @@
       <button
         v-else
         class="btn bg-primary border-radius-1 border-none px-4 py-2 text-white"
-        :disabled="!rounds.length"
+        :disabled="races.length !== 0"
         @click="runProgramSequence"
       >
         Start
