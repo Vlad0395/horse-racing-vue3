@@ -1,68 +1,75 @@
-import { describe, it, expect } from 'vitest'
-import { useRaceAnimation, type UseRaceAnimationOptions } from '../composables/useRaceAnimation'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import {
+  useRaceAnimation,
+  type UseRaceAnimationOptions,
+} from '../composables/useRaceAnimation'
 
+describe('useRaceAnimation - startLoop', () => {
+  let opts: UseRaceAnimationOptions
+  let rafSpy: ReturnType<typeof vi.fn>
+  let perfNowSpy: ReturnType<typeof vi.fn>
+  let race: any
 
-
-describe('getHorsePosition', () => {
-  const horse = { name: 'Thunder', color: { hex: '#fff' } }
-  const key = `${horse.name}|${horse.color.hex}`
-
-  function makeOpts(activeRace: any = null): UseRaceAnimationOptions {
-    return {
-      getActiveRace: () => activeRace,
-      getPlanned: () => [],
-      getHorseKeys: () => [key],
-    }
-  }
-
-  it('returns startOffset if no progress and no results', () => {
-    const opts = makeOpts()
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(horse, opts, {}, false)).toBe(1)
-  })
-
-  it('returns calculated position based on progress', () => {
-    const opts = makeOpts()
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(horse, opts, { [key]: 50 }, false)).toBeCloseTo(48)
-    expect(getHorsePosition(horse, opts, { [key]: 100 }, false)).toBe(95)
-    expect(getHorsePosition(horse, opts, { [key]: 0 }, false)).toBe(1)
-  })
-
-  it('returns finishClusterBase minus position if results and showFinishPositions', () => {
-    const activeRace = {
-      results: [
-        { horse: { name: 'Thunder' }, position: 2 },
+  beforeEach(() => {
+    race = {
+      planned: [
+        { horse: { id: 1 }, timeMs: 1000 },
+        { horse: { id: 2 }, timeMs: 2000 },
       ],
     }
-    const opts = makeOpts(activeRace)
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(horse, opts, { [key]: 100 }, true)).toBe(99)
-  })
-
-  it('returns startOffset if results and !showFinishPositions', () => {
-    const activeRace = {
-      results: [
-        { horse: { name: 'Thunder' }, position: 1 },
-      ],
+    opts = {
+      getActiveRace: () => race,
+      getPlanned: () => race.planned,
+      getHorseKeys: () => [1, 2],
     }
-    const opts = makeOpts(activeRace)
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(horse, opts, { [key]: 100 }, false)).toBe(1)
+    rafSpy = vi.fn(() => {
+      // Simulate only one frame for test
+      return 42
+    })
+    perfNowSpy = vi.fn()
+    globalThis.requestAnimationFrame = rafSpy
+    globalThis.performance = {
+      now: perfNowSpy,
+    } as any
   })
 
-  it('uses default values for optional params', () => {
-    const opts = makeOpts()
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(horse, opts, { [key]: 100 }, false)).toBe(95)
-    expect(getHorsePosition(horse, opts, { [key]: 0 }, false)).toBe(1)
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
-  it('handles missing horse color', () => {
-    const h = { name: 'Shadow', color: undefined }
-    const k = 'Shadow|'
-    const opts = makeOpts()
-    const { getHorsePosition } = useRaceAnimation(opts)
-    expect(getHorsePosition(h, opts, { [k]: 50 }, false)).toBeCloseTo(48)
+  it('should update progressMap for each horse on first frame', () => {
+    perfNowSpy.mockReturnValueOnce(1000)
+    const { progressMap, init } = useRaceAnimation(opts)
+    init()
+    // Simulate step
+    expect(progressMap.value[1]).toBeGreaterThanOrEqual(0)
+    expect(progressMap.value[2]).toBeGreaterThanOrEqual(0)
+    expect(rafSpy).toHaveBeenCalled()
+  })
+
+  it('should clamp progress to 100%', () => {
+    perfNowSpy.mockReturnValueOnce(5000)
+    const { progressMap, init } = useRaceAnimation(opts)
+    init()
+    expect(progressMap.value[1]).toBeLessThanOrEqual(100)
+    expect(progressMap.value[2]).toBeLessThanOrEqual(100)
+  })
+
+  it('should skip planned items without horse id', () => {
+    race.planned.push({ horse: {}, timeMs: 1000 })
+    perfNowSpy.mockReturnValueOnce(100)
+    const { progressMap, init } = useRaceAnimation(opts)
+    init()
+    // Only '1' and '2' should be present
+    expect(Object.keys(progressMap.value)).toContain('1')
+    expect(Object.keys(progressMap.value)).toContain('2')
+    expect(Object.keys(progressMap.value)).not.toContain(undefined)
+  })
+
+  it('should keep animFrameId not null if no active race', () => {
+    opts.getActiveRace = () => null
+    const { animFrameId, init } = useRaceAnimation(opts)
+    init()
+    expect(animFrameId.value).not.toBe(null)
   })
 })

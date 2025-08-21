@@ -100,11 +100,13 @@ export default defineComponent({
       }))
     },
     lapLabel(): string {
+      const lengthRaces = (this.races as Race[])?.length
+      const lengthPrograms = (this.programRounds as ProgramRound[])?.length
       if (this.activeRace)
         return `${(this.activeRace as Race).programRound || 1}.st Lap ${(this.activeRace as Race).distance || 1200}m`
       if (this.programRounds && (this.programRounds as ProgramRound[]).length) {
         const current = (this.programRounds as ProgramRound[])[
-          (this.races as Race[])?.length ?? 0
+          lengthRaces === lengthPrograms ? lengthRaces - 1 : (lengthRaces ?? 0)
         ]
         return `${current?.round ?? (this.races as Race[])?.length}.st Lap ${current.distance}m`
       }

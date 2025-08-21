@@ -41,8 +41,6 @@ export function useRaceAnimation(opts: UseRaceAnimationOptions) {
         animFrameId.value = requestAnimationFrame(step)
         return
       }
-      animFrameId.value = null
-      return
     }
     animFrameId.value = requestAnimationFrame(step)
   }
