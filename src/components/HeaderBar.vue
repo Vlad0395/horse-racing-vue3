@@ -2,13 +2,13 @@
   <header class="header-bar">
     <h1 class="header-title">Horse Racing</h1>
     <div class="header-buttons">
-      <button class="btn" :disabled="active" @click="generateAll">Generate program</button>
+      <button class="btn btn-generate-races" :disabled="active" @click="generateAll">Generate program</button>
       <button v-if="active" class="btn" @click="cancelProgramSequence">
         Cancel
       </button>
       <button
         v-else
-        class="btn"
+        class="btn btn-start-race"
         :disabled="!rounds.length"
         @click="runProgramSequence"
       >
