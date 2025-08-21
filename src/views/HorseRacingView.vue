@@ -17,6 +17,8 @@
             :items="rounds"
             :headers="programHeaders"
             :noDataText="'No programs available'"
+            itemKey="horses"
+            :subtitle="(item) => `${item.round}st lap - ${item.distance}m`"
           />
         </template>
         <template #tab-3>
@@ -25,6 +27,10 @@
             :items="races"
             :headers="resultsHeaders"
             :noDataText="'No results available'"
+            itemKey="results"
+            :subtitle="
+              (item) => `${item.programRound}st lap - ${item.distance}m`
+            "
           />
         </template>
       </Tabs>
@@ -40,12 +46,16 @@
         :items="rounds"
         :headers="programHeaders"
         :noDataText="'No programs available'"
+        itemKey="horses"
+        :subtitle="(item) => `${item.round}st lap - ${item.distance}m`"
       />
       <InfoPanel
         :title="'Results'"
         :items="races"
         :headers="resultsHeaders"
         :noDataText="'No results available'"
+        itemKey="results"
+        :subtitle="(item) => `${item.programRound}st lap - ${item.distance}m`"
       />
     </div>
   </main>

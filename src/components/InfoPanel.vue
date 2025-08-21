@@ -8,7 +8,7 @@
     <div>
       <div
         v-for="item in items"
-        :key="itemKey(item)"
+        :key="item.id || item.round"
         class="bg-accent border-radius-2 mb-3"
       >
         <h2 class="fs-16 fw-600 mb-2 p-3">
@@ -19,10 +19,10 @@
         <Table
           :headers="headers"
           :items="
-            item[`${item.horses ? 'horses' : 'results'}`].map((i, index) => ({
+            item[`${itemKey}`]?.map((i, index) => ({
               position: i?.position ?? index + 1,
-              name: i.name,
-            }))
+              name: i?.name ?? i.horse?.name,
+            })) ?? []
           "
           :noDataText="noDataText"
         />
@@ -42,7 +42,7 @@ export default {
     headers: { type: Array, required: true },
     noDataText: { type: String, default: 'No data available' },
     subtitle: { type: Function, default: () => '' },
-    itemKey: { type: Function, default: (item) => item.id || item.round },
+    itemKey: { type: String, default: '' },
   },
 }
 </script>
