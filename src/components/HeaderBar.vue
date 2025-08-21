@@ -3,9 +3,9 @@
     class="header-bar bg-panel-gray w-100 d-flex justify-space-between items-center px-5 py-3"
   >
     <h1 class="header-title text-text-dark fs-24 fw-600">Horse Racing</h1>
-    <div class="header-buttons d-flex gap-3 items-center">
+    <div class="header-buttons d-flex items-center gap-3">
       <button
-        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
+        class="btn btn-generate bg-primary border-radius-1 fs-16 cursor-pointer border-none px-4 py-2 text-white"
         :disabled="races.length !== rounds.length"
         @click="generateAll"
       >
@@ -13,14 +13,14 @@
       </button>
       <button
         v-if="active || (races.length > 0 && races.length !== rounds.length)"
-        class="btn bg-deep-blue border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
+        class="btn bg-deep-blue border-radius-1 fs-16 cursor-pointer border-none px-4 py-2 text-white"
         @click="cancelProgramSequence"
       >
         Cancel
       </button>
       <button
         v-else
-        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
+        class="btn btn-start bg-primary border-radius-1 fs-16 cursor-pointer border-none px-4 py-2 text-white"
         :disabled="races.length !== 0"
         @click="runProgramSequence"
       >
@@ -61,7 +61,7 @@ export default {
       flex-direction: column
       align-items: flex-start
   &-buttons
-    @media screen and (max-width: 375)
+    @media screen and (max-width: 600px)
       flex-direction: column
       width: 100%
   &-button

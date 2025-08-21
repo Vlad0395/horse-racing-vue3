@@ -1,5 +1,5 @@
 <template>
-  <div class="info-panel min-w-200 overflow-auto">
+  <div class="info-panel max-w-200 w-100 overflow-auto">
     <div
       class="info-panel__header bg-panel-gray d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
     >

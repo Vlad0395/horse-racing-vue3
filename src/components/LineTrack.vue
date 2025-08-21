@@ -1,7 +1,7 @@
 <template>
   <div class="lane d-grid">
     <div class="lane__number d-flex justify-center items-center fs-14 fw-600">{{ lane.number }}</div>
-    <div class="lane__track" ref="racetrackRef">
+    <div class="lane__track">
       <div
         v-if="lane.horse"
         class="horse d-flex items-center absolute flex-column"

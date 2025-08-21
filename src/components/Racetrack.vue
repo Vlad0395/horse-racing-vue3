@@ -3,7 +3,10 @@
     class="racetrack border-radius-1 d-flex flex-column relative overflow-hidden px-3 pb-8 pt-2"
   >
     <div class="racetrack__finish-line absolute" ref="finishLineRef" />
-    <div class="racetrack__lanes d-grid h-100 relative gap-0">
+    <div
+      class="racetrack__lanes d-grid h-100 relative gap-0"
+      ref="racetrackRef"
+    >
       <LineTrack
         v-for="lane in lanes"
         :key="(lane as Lane).number"
@@ -64,13 +67,24 @@ export default defineComponent({
       programRounds: (state: { rounds: ProgramRound[] }): ProgramRound[] =>
         state.rounds,
     }),
+    ...mapState('races', {
+      races: (state: { races: Race[] }) => state.races || null,
+    }),
     activeRace(): Race | null {
       return (this.currentRace as Race) || null
     },
     previewHorses(): HorseBase[] {
+      const lengthRaces = (this.races as Race[])?.length
+      const lengthPrograms = (this.programRounds as ProgramRound[])?.length
       if (this.activeRace) return []
-      if (this.programRounds && (this.programRounds as ProgramRound[]).length)
-        return (this.programRounds as ProgramRound[])[0].horses || []
+      if (lengthPrograms)
+        return (
+          (this.programRounds as ProgramRound[])[
+            lengthRaces === lengthPrograms
+              ? lengthRaces - 1
+              : (lengthRaces ?? 0)
+          ]?.horses ?? []
+        )
       return []
     },
     horsesInRace(): HorseBase[] {
@@ -89,8 +103,10 @@ export default defineComponent({
       if (this.activeRace)
         return `${(this.activeRace as Race).programRound || 1}.st Lap ${(this.activeRace as Race).distance || 1200}m`
       if (this.programRounds && (this.programRounds as ProgramRound[]).length) {
-        const first = (this.programRounds as ProgramRound[])[0]
-        return `${first.round}.st Lap ${first.distance}m`
+        const current = (this.programRounds as ProgramRound[])[
+          (this.races as Race[])?.length ?? 0
+        ]
+        return `${current?.round ?? (this.races as Race[])?.length}.st Lap ${current.distance}m`
       }
       return ''
     },
@@ -103,10 +119,6 @@ export default defineComponent({
         this.activeRace ? (this.activeRace as Race).planned || [] : [],
       getHorseKeys: () =>
         (this.horsesInRace as HorseBase[]).map((h) => this.horseKey(h)),
-      getPreviewHorseKeys: () =>
-        (this.previewHorses as HorseBase[]).map((h) => this.horseKey(h)),
-      onFinish: () => {},
-      finishDelayMs: this.postFinishResetDelayMs,
     })
     this.initProgress()
   },
@@ -115,7 +127,6 @@ export default defineComponent({
     if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler)
     }
-    if (this.raceAnim) this.raceAnim.stop()
   },
   watch: {
     horsesInRace() {
@@ -135,50 +146,37 @@ export default defineComponent({
   },
   methods: {
     horseKey(h: HorseBase) {
-      return `${h.name}|${h.color?.hex ?? h.color ?? ''}`
+      return h.id
     },
     initProgress() {
       if (!this.raceAnim) return
       this.raceAnim.init()
-      this.calcFinishPercent()
     },
     horseStyle(h: HorseBase) {
       if (!this.raceAnim) return
+      const liveFinish = this.calcFinishPercent()
       const x = this.raceAnim.getHorsePosition(
         h,
-        {
-          getActiveRace: () => this.activeRace,
-          getPlanned: () =>
-            this.activeRace ? (this.activeRace as Race).planned || [] : [],
-          getHorseKeys: () =>
-            (this.horsesInRace as HorseBase[]).map((h) => this.horseKey(h)),
-        },
         this.raceAnim.progressMap,
-        this.raceAnim.showFinishPositions,
         this.animParams.startOffset,
-        this.animParams.liveFinish,
-        this.animParams.finishClusterBase,
-        this.animParams.finishClusterGap
+        liveFinish
       )
-      const left = Math.min(x, this.animParams.liveFinish)
+      const left = Math.min(x, liveFinish ?? 95)
       return { left: `${left}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
 
     calcFinishPercent() {
-      const track = this.$refs.racetrackRef as HTMLElement | undefined
+      const track = this.$el.querySelector('.lane__track')
       const finish = this.$refs.finishLineRef as HTMLElement | undefined
       if (track && finish) {
-        const trackRect = (track as any)?.[0].getBoundingClientRect()
+        const trackRect = track.getBoundingClientRect()
         const finishRect = finish.getBoundingClientRect()
         const finishRight = finishRect.right - trackRect.left
         const percent =
           ((finishRight - finishRect.width / 2 - 15) / trackRect.width) * 100
-        this.animParams.liveFinish = percent
+        return percent
       }
     },
-  },
-  unmounted() {
-    this.raceAnim?.stop()
   },
 })
 </script>

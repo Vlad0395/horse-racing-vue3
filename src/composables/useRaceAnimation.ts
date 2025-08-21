@@ -1,36 +1,21 @@
-import { ref, onBeforeUnmount } from 'vue'
+import { ref } from 'vue'
+import type { HorseBase } from '../utils'
 
 export interface UseRaceAnimationOptions {
   getActiveRace: () => any
-  getPlanned: () => any[] // return race.planned or []
-  getHorseKeys: () => string[]
-  onFinish?: () => void // callback when race finishes
-  getPreviewHorseKeys?: () => string[] // keys для прев'ю коли немає активної гонки
-  onReset?: () => void // callback після автоматичного reset
-  finishDelayMs?: number
+  getPlanned: () => any[]
+  getHorseKeys: () => number[]
 }
 
 export function useRaceAnimation(opts: UseRaceAnimationOptions) {
-  // СТАН (перший крок винесення)
-  const progressMap = ref<Record<string, number>>({}) // ключ коня -> %
-  const animFrameId = ref<number | null>(null) // id requestAnimationFrame
-  const showFinishPositions = ref(false) // показ кластера після фінішу
-  const afterReset = ref(false) // вже виконано reset
-  const finishDelayMs = opts.finishDelayMs ?? 1500 // затримка перед reset
-  const racePerfStart = new WeakMap<any, number>() // race -> perfStart
-  let resetTimeout: number | null = null
+  const progressMap = ref<Record<string, number>>({})
+  const animFrameId = ref<number | null>(null) 
+  const racePerfStart = new WeakMap<any, number>()
 
   function init() {
-    stop()
-    if (resetTimeout) {
-      clearTimeout(resetTimeout)
-      resetTimeout = null
-    }
     Object.keys(progressMap.value).forEach(
       (key) => delete progressMap.value[key]
     )
-    showFinishPositions.value = false
-    afterReset.value = false
     for (const key of opts.getHorseKeys()) {
       progressMap.value[key] = 0
     }
@@ -40,7 +25,7 @@ export function useRaceAnimation(opts: UseRaceAnimationOptions) {
   function startLoop() {
     const step = () => {
       const race = opts.getActiveRace()
-      if (race && race.planned && !race.finishedAt) {
+      if (race && race.planned) {
         const now = performance.now()
         let start = racePerfStart.get(race)
         if (start == null) {
@@ -49,93 +34,38 @@ export function useRaceAnimation(opts: UseRaceAnimationOptions) {
         }
         const elapsed = now - start
         for (const p of race.planned) {
-          const key = p?.horse ? plannedHorseKey(p) : undefined
-          if (!key) continue
+          if (!p?.horse?.id) continue
           const pct = Math.min(100, (elapsed / p.timeMs) * 100)
-          progressMap.value[key] = pct
+          progressMap.value[p.horse.id] = pct
         }
         animFrameId.value = requestAnimationFrame(step)
         return
       }
-
-      if (race && race.results && !showFinishPositions.value) {
-        showFinishPositions.value = true
-        opts.onFinish?.()
-        resetTimeout = window.setTimeout(() => {
-          resetToStartPositions()
-        }, finishDelayMs) as unknown as number
-      }
-      if (!opts.getActiveRace() && opts.getPreviewHorseKeys) {
-        for (const key of opts.getPreviewHorseKeys()) progressMap.value[key] = 0
-      }
       animFrameId.value = null
+      return
     }
     animFrameId.value = requestAnimationFrame(step)
   }
 
-  function resetToStartPositions() {
-    afterReset.value = true
-    showFinishPositions.value = false
-    if (!opts.getActiveRace() && opts.getPreviewHorseKeys) {
-      for (const key of opts.getPreviewHorseKeys()) progressMap.value[key] = 0
-    }
-    opts.onReset?.()
-  }
-
-  function plannedHorseKey(p: any): string | undefined {
-    if (!p || !p.horse) return undefined
-    const color = p.horse?.color?.hex ?? p.horse?.color ?? ''
-    return `${p.horse.name}|${color}`
-  }
-  function stop() {
-    if (animFrameId.value != null) {
-      cancelAnimationFrame(animFrameId.value)
-      animFrameId.value = null
-    }
-    if (resetTimeout) {
-      clearTimeout(resetTimeout)
-      resetTimeout = null
-    }
-  }
-
   function getHorsePosition(
-    h: any,
-    opts: UseRaceAnimationOptions,
+    h: HorseBase,
     progressMap: Record<string, number>,
-    showFinishPositions: boolean,
     startOffset = 1,
-    liveFinish = 95,
-    finishClusterBase = 100,
-    finishClusterGap = 1
+    liveFinish = 95
   ) {
-    const key = `${h.name}|${h.color?.hex ?? h.color ?? ''}`
-    const val = progressMap[key]
-    const ar = opts.getActiveRace()
-    if (ar && ar.results) {
-      const res = ar.results.find((r: any) => r.horse.name === h.name)
-      if (res && showFinishPositions) {
-        return finishClusterBase - (res.position - 1) * finishClusterGap
-      } else if (res && !showFinishPositions) {
-        return startOffset
-      }
-    }
+    const val = progressMap[h.id]
     if (val == null) return startOffset
     const from = startOffset
     const to = liveFinish
-    return from + (to - from) * (Math.min(100, Math.max(0, val)) / 100)
+    const position =
+      from + (to - from) * (Math.min(100, Math.max(0, val)) / 100)
+    return position
   }
-
-  onBeforeUnmount(stop)
 
   return {
     progressMap,
-    showFinishPositions,
-    afterReset,
     animFrameId,
-    finishDelayMs,
     init,
-    stop,
-    resetToStartPositions,
     getHorsePosition,
   }
 }
