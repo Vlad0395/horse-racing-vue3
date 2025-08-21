@@ -4,8 +4,6 @@
     <img
       class="banner"
       src="/src/assets/banner-horse.webp"
-      width="500"
-      height="400"
       alt="Welcome to horse racing"
     />
     <router-link class="start-btn" to="/racing">Start Race</router-link>
@@ -46,12 +44,20 @@ export default {
   color: #2d3436
   margin-bottom: 30px
   animation: fadeIn 1s ease
-
+  @media screen and (max-width: 768px)
+    font-size: 24px
+    text-align: center
+    max-width: 300px
 .banner
   border-radius: 20px
   box-shadow: 0 8px 32px rgba(44, 62, 80, 0.15)
   margin-bottom: 30px
   animation: bounce 2s infinite
+  width: 500px
+  height: 400px
+  @media screen and (max-width: 768px)
+    width: 100%
+    height: auto
 
 .start-btn
   padding: 15px 40px

@@ -5,22 +5,22 @@
     <h1 class="header-title fs-24 fw-600">Horse Racing</h1>
     <div class="header-buttons d-flex items-center gap-3">
       <button
-        class="btn bg-primary border-radius-1 border-none px-4 py-2 text-white"
-        :disabled="active || races.length >= 5"
+        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white"
+        :disabled="races.length !== rounds.length"
         @click="generateAll"
       >
-        Generate program {{ races.length }}
+        Generate program
       </button>
       <button
-        v-if="active"
-        class="btn bg-secondary border-radius-1 border-none px-4 py-2 text-white"
+        v-if="active || (races.length > 0 && races.length !== rounds.length)"
+        class="btn bg-secondary border-radius-1 fs-16 border-none px-4 py-2 text-white"
         @click="cancelProgramSequence"
       >
         Cancel
       </button>
       <button
         v-else
-        class="btn bg-primary border-radius-1 border-none px-4 py-2 text-white"
+        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white"
         :disabled="races.length !== 0"
         @click="runProgramSequence"
       >
@@ -57,11 +57,18 @@ export default {
     background-color: #f5f5f5
     border-bottom: 1px solid #eee
     box-sizing: border-box
+    @media screen and (max-width: 375px)
+      padding: 8px 24px
+      flex-direction: column
+      align-items: flex-start
 
   &-title
     color: #333
   &-buttons
     gap: 10px
+    @media screen and (max-width: 375)
+      flex-direction: column
+      width: 100%
   &-button
     background-color: transparent
     border: none

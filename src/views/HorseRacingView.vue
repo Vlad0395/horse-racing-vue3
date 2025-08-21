@@ -12,10 +12,20 @@
           <Racetrack />
         </template>
         <template #tab-2>
-          <Programs />
+          <InfoPanel
+            :title="'Programs'"
+            :items="rounds"
+            :headers="programHeaders"
+            :noDataText="'No programs available'"
+          />
         </template>
         <template #tab-3>
-          <Results />
+          <InfoPanel
+            :title="'Results'"
+            :items="races"
+            :headers="resultsHeaders"
+            :noDataText="'No results available'"
+          />
         </template>
       </Tabs>
     </template>
@@ -25,8 +35,18 @@
     >
       <HorsesList />
       <Racetrack class="main__content-field" />
-      <Programs />
-      <Results />
+      <InfoPanel
+        :title="'Programs'"
+        :items="rounds"
+        :headers="programHeaders"
+        :noDataText="'No programs available'"
+      />
+      <InfoPanel
+        :title="'Results'"
+        :items="races"
+        :headers="resultsHeaders"
+        :noDataText="'No results available'"
+      />
     </div>
   </main>
 </template>
@@ -35,25 +55,35 @@
 import { mapState } from 'vuex'
 import HeaderBar from '../components/HeaderBar.vue'
 import HorsesList from '../components/HorsesList.vue'
-import Programs from '../components/Programs.vue'
-import Results from '../components/Results.vue'
 import Racetrack from '../components/Racetrack.vue'
-import Tabs from '../components/tabs/index.vue'
+import Tabs from '../components/Tabs.vue'
 import { useWindowWidth } from '../composables/useWindowWidth'
+import InfoPanel from '../components/InfoPanel.vue'
 export default {
   name: 'HorseRacingView',
   components: {
     HeaderBar,
     HorsesList,
-    Programs,
-    Results,
     Racetrack,
     Tabs,
+    InfoPanel,
   },
   data() {
     return {
       isLessThan: false,
+      programHeaders: [
+        { text: 'Position', value: 'position', width: '100px' },
+        { text: 'Name', value: 'name' },
+      ],
+      resultsHeaders: [
+        { text: 'Position', value: 'position', width: '100px' },
+        { text: 'Name', value: 'name' },
+      ],
     }
+  },
+  computed: {
+    ...mapState('programs', ['rounds']),
+    ...mapState('races', ['races']),
   },
   created() {
     const { isLessThan } = useWindowWidth(1366)
@@ -72,7 +102,6 @@ export default {
   box-sizing: border-box
   overflow-y: auto
   &__content
-    height: 100%
     min-height: calc(100vh - 100px)
     box-sizing: border-box
 

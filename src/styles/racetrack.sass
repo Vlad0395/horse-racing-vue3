@@ -1,0 +1,65 @@
+.racetrack
+  background: #d9d9d9
+  flex: 1
+  box-shadow: 0 0 0 1px #c5c5c5 inset
+
+  &__lanes
+    flex: 1
+    grid-template-rows: repeat(10, 1fr)
+    min-height: 625px
+    box-sizing: border-box
+    @media screen and (max-width: 1366px)
+      min-height: 420px
+    @media screen and (max-width: 600px)
+      min-height: 280px
+
+  &__finish-line
+    top: 8px
+    bottom: 56px
+    right: 60px
+    width: 3px
+    background: #c52a1f
+    z-index: 5
+
+  &__footer
+    color: #b4281d
+    .finish-text
+      color: #c52a1f
+      letter-spacing: 1px
+
+.lane
+  position: relative
+  grid-template-columns: 40px 1fr
+  border-bottom: 1px dashed #666
+  &:first-child
+    border-top: 1px dashed #666
+
+  &__number
+    background: #3b5f24
+    color: #fff
+    border-right: 2px solid #fff
+
+  &__track
+    position: relative
+    padding: 4px 0
+
+.horse
+  top: 50%
+  left: 0
+  transform: translateY(-50%) scaleX(-1)
+  will-change: left
+  pointer-events: none
+  svg
+    width: 90px
+    height: auto
+    @media screen and (max-width: 1024px)
+      width: 120px
+    @media screen and (max-width: 375px)
+      width: 60px
+
+  &__label
+    transform: translateY(-50%) scaleX(-1)
+    color: #222
+    white-space: nowrap
+    @media screen and (max-width: 1366px)
+      display: none

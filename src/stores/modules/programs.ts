@@ -17,7 +17,8 @@ interface ProgramsState {
 
 const state: ProgramsState = {
   rounds: [],
-  distances: [1200, 1400, 1600, 1800, 2000, 2200],
+  // distances: [1200, 1400, 1600, 1800, 2000, 2200],
+  distances: [1200, 1400],
   totalHorsesPerRound: 10,
 }
 

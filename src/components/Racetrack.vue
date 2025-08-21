@@ -1,23 +1,18 @@
 <template>
-  <div class="racetrack" ref="racetrackRef">
-    <div class="racetrack__finish-line" ref="finishLineRef" />
-    <div class="racetrack__lanes">
-      <div v-for="lane in lanes as Lane[]" :key="lane.number" class="lane">
-        <div class="lane__number">{{ lane.number }}</div>
-        <div class="lane__track">
-          <div
-            v-if="lane.horse"
-            class="horse"
-            :style="horseStyle(lane.horse)"
-            :title="lane.horse.name + ' (cond ' + lane.horse.condition + ')'"
-          >
-            <Icon size="90" :color="lane.horse.color.hex" />
-            <span class="horse__label">{{ lane.horse.name }}</span>
-          </div>
-        </div>
-      </div>
+  <div
+    class="racetrack border-radius-1 d-flex relative overflow-hidden px-3 pb-8 pt-2 flex-column"
+  >
+    <div class="racetrack__finish-line absolute" ref="finishLineRef" />
+    <div class="racetrack__lanes d-grid relative h-100 gap-0">
+      <LineTrack
+        v-for="lane in lanes"
+        :key="(lane as Lane).number"
+        class="lane"
+        :lane="lane"
+        :horseStyle="horseStyle"
+      />
     </div>
-    <div class="racetrack__footer">
+    <div class="racetrack__footer d-flex justify-space-between items-center fs-14 fw-600 mt-2">
       <span class="lap">{{ lapLabel }}</span>
       <span class="finish-text">FINISH</span>
     </div>
@@ -25,13 +20,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent } from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import type { HorseBase } from '../utils/horseNames'
 import Icon from './IconHorse.vue'
 import { useRaceAnimation } from '../composables/useRaceAnimation'
 import type { ProgramRound } from '../stores/modules/programs'
 import type { Race } from '../stores/modules/races'
+import LineTrack from './LineTrack.vue'
 
 interface Lane {
   number: number
@@ -41,6 +37,7 @@ export default defineComponent({
   name: 'Racetrack',
   components: {
     Icon,
+    LineTrack,
   },
   data() {
     return {
@@ -52,7 +49,6 @@ export default defineComponent({
         finishClusterBase: 100,
         finishClusterGap: 1,
       },
-      finishPercent: 94.5, // позиція фінішу у %
       resizeHandler: null,
     }
   },
@@ -112,15 +108,7 @@ export default defineComponent({
     })
     this.initProgress()
   },
-  mounted() {
-    nextTick(() => {
-      this.calcFinishPercent()
-      //@ts-ignore
-      this.resizeHandler = () => this.calcFinishPercent()
-      //@ts-ignore
-      window.addEventListener('resize', this.resizeHandler)
-    })
-  },
+
   beforeUnmount() {
     if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler)
@@ -150,6 +138,7 @@ export default defineComponent({
     initProgress() {
       if (!this.raceAnim) return
       this.raceAnim.init()
+      this.calcFinishPercent()
     },
     horseStyle(h: HorseBase) {
       if (!this.raceAnim) return
@@ -169,22 +158,19 @@ export default defineComponent({
         this.animParams.finishClusterBase,
         this.animParams.finishClusterGap
       )
-      // Обмеження: кінь не переходить фінішну лінію
       const left = Math.min(x, this.animParams.liveFinish)
       return { left: `${left}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
 
     calcFinishPercent() {
-      // Розрахунок позиції фінішу у %
       const track = this.$refs.racetrackRef as HTMLElement | undefined
       const finish = this.$refs.finishLineRef as HTMLElement | undefined
       if (track && finish) {
-        const trackRect = track.getBoundingClientRect()
+        const trackRect = (track as any)?.[0].getBoundingClientRect()
         const finishRect = finish.getBoundingClientRect()
         const finishRight = finishRect.right - trackRect.left
         const percent =
-          ((finishRight - finishRect.width / 2) / trackRect.width) * 100
-        this.finishPercent = percent
+          ((finishRight - finishRect.width / 2 - 15) / trackRect.width) * 100
         this.animParams.liveFinish = percent
       }
     },
@@ -194,96 +180,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="sass" scoped>
-.racetrack
-  position: relative
-  background: #d9d9d9
-  padding: 8px 12px 32px
-  border-radius: 4px
-  flex: 1
-  display: flex
-  flex-direction: column
-  overflow: hidden
-  box-shadow: 0 0 0 1px #c5c5c5 inset
-
-  &__lanes
-    position: relative
-    flex: 1
-    display: grid
-    grid-template-rows: repeat(10, 1fr)
-    gap: 0
-    min-height: 625px
-    height: 100%
-    box-sizing: border-box
-    @media screen and (max-width: 1366px)
-      min-height: 420px
-      grid-template-rows: repeat(10, 1fr)
-    @media screen and (max-width: 600px)
-      min-height: 280px
-      grid-template-rows: repeat(10, 1fr)
-      height: 100%
-
-  &__finish-line
-    position: absolute
-    top: 8px
-    bottom: 56px
-    right: 60px
-    width: 3px
-    background: #c52a1f
-    z-index: 5
-
-  &__footer
-    display: flex
-    justify-content: space-between
-    align-items: center
-    font-size: 14px
-    font-weight: 600
-    color: #b4281d
-    margin-top: 8px
-    .finish-text
-      color: #c52a1f
-      letter-spacing: 1px
-
-.lane
-  position: relative
-  display: grid
-  grid-template-columns: 40px 1fr
-  border-bottom: 1px dashed #666
-  &:first-child
-    border-top: 1px dashed #666
-
-  &__number
-    background: #3b5f24
-    color: #fff
-    display: flex
-    justify-content: center
-    align-items: center
-    font-weight: 600
-    font-size: 14px
-    border-right: 2px solid #fff
-
-  &__track
-    position: relative
-    padding: 4px 0
-
-.horse
-  position: absolute
-  top: 50%
-  left: 0
-  transform: translateY(-50%) scaleX(-1)
-  will-change: left
-  display: flex
-  flex-direction: column
-  align-items: center
-  pointer-events: none
-  &__label
-    transform: translateY(-50%) scaleX(-1)
-    font-size: 12px
-    color: #222
-    padding: 1px 4px
-    white-space: nowrap
-    @media screen and (max-width: 1366px)
-      position: absolute
-      bottom: 0
-</style>

@@ -1,10 +1,11 @@
 
 @use './_variables'
-@each $w in 15, 30, 50, 75, 100
-  .w-#{$w}
-    width: #{$w + %}
-
-@for $i from 1 through 20
+@each $i in 15, 30, 50, 75, 100
+  .w-#{$i}
+    width: #{$i + %}
+  .h-#{$i}
+    height: #{$i + %}
+@for $i from 0 through 20
   $step: 4px
   .m-#{$i}
     margin: #{ $i * $step }
@@ -126,3 +127,20 @@ $justify: ('center', 'start', 'end', 'space-between', 'space-around')
 @each $var in $justify
   .justify-#{$var}
     justify-content: #{$var}
+$direction: ('row', 'column')
+@each $var in $direction
+  .flex-#{$var}
+    flex-direction: #{$var}
+
+$position: ('static', 'relative', 'absolute', 'fixed', 'sticky')
+@each $var in $position
+  .#{$var}
+    position: #{$var}
+
+.cursor
+  &-pointer
+    cursor: pointer
+  &-default
+    cursor: default
+  &-text
+    cursor: text
