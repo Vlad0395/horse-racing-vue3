@@ -20,8 +20,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import horses from '../../stores/modules/horses'
-import Table from '../table/Table.vue'
+import horses from '../stores/modules/horses'
+import Table from './table/Table.vue'
 
 export default {
   name: 'HorseList',
@@ -44,7 +44,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped src="../table/index.sass" />
+<style lang="sass" scoped src="./table/index.sass" />
 <style lang="sass" scoped>
 .horse-list
   &__count

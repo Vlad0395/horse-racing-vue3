@@ -1,5 +1,5 @@
 <template>
-  <div v-if="races.length" class="results min-w-300 overflow-auto">
+  <div v-if="races.length" class="results min-w-200 overflow-auto">
     <div
       class="results__header d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
     >

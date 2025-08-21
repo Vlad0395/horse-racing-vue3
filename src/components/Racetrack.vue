@@ -11,8 +11,8 @@
             :style="horseStyle(lane.horse)"
             :title="lane.horse.name + ' (cond ' + lane.horse.condition + ')'"
           >
-          <Icon size="90" :color="lane.horse.color.hex" />
-          <span class="horse__label">{{ lane.horse.name }}</span>
+            <Icon size="90" :color="lane.horse.color.hex" />
+            <span class="horse__label">{{ lane.horse.name }}</span>
           </div>
         </div>
       </div>
@@ -27,11 +27,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { mapGetters, mapState } from 'vuex'
-import type { HorseBase } from '../../utils/horseNames'
-import Icon from '../IconHorse.vue'
-import { useRaceAnimation } from '../../composables/useRaceAnimation'
-import type { ProgramRound } from '../../stores/modules/programs'
-import type { Race } from '../../stores/modules/races'
+import type { HorseBase } from '../utils/horseNames'
+import Icon from './IconHorse.vue'
+import { useRaceAnimation } from '../composables/useRaceAnimation'
+import type { ProgramRound } from '../stores/modules/programs'
+import type { Race } from '../stores/modules/races'
 
 interface Lane {
   number: number
@@ -179,7 +179,16 @@ export default defineComponent({
     display: grid
     grid-template-rows: repeat(10, 1fr)
     gap: 0
-    min-height: 420px
+    min-height: 625px
+    height: 100%
+    box-sizing: border-box
+    @media screen and (max-width: 1366px)
+      min-height: 420px
+      grid-template-rows: repeat(10, 1fr)
+    @media screen and (max-width: 600px)
+      min-height: 280px
+      grid-template-rows: repeat(10, 1fr)
+      height: 100%
 
   &__finish-line
     position: absolute
@@ -234,16 +243,13 @@ export default defineComponent({
   flex-direction: column
   align-items: center
   pointer-events: none
-  &__icon
-    font-size: 40px
-    line-height: 1
-    filter: grayscale(1)
   &__label
     transform: translateY(-50%) scaleX(-1)
     font-size: 12px
     color: #222
     padding: 1px 4px
-    border-radius: 3px
-    margin-top: 2px
     white-space: nowrap
+    @media screen and (max-width: 1366px)
+      position: absolute
+      bottom: 0
 </style>

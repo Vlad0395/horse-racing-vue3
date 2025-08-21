@@ -1,5 +1,5 @@
 <template>
-  <div class="program min-w-300 overflow-auto">
+  <div class="program min-w-200 overflow-auto">
     <div
       class="program__header d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
     >
