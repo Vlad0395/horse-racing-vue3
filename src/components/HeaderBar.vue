@@ -6,10 +6,10 @@
     <div class="header-buttons d-flex items-center gap-3">
       <button
         class="btn bg-primary border-radius-1 border-none px-4 py-2 text-white"
-        :disabled="active || races.length !== 6"
+        :disabled="active || races.length >= 5"
         @click="generateAll"
       >
-        Generate program
+        Generate program {{ races.length }}
       </button>
       <button
         v-if="active"
