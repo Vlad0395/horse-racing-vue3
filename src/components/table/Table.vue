@@ -40,8 +40,6 @@ export default {
   },
   methods: {
     getItemValue(item, header) {
-      // header.value can be a string like 'horse.name'
-
       if (header.includes('.')) {
         return header.split('.').reduce((obj, prop) => obj && obj[prop], item)
       }

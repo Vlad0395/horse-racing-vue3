@@ -32,7 +32,6 @@ export default {
   },
   data() {
     return {
-      // results: []
       headers: [
         { text: 'Position', value: 'position', width: '100px' },
         { text: 'Name', value: 'name' },

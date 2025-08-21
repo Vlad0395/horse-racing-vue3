@@ -8,7 +8,6 @@
         <h2 class="program__round program__round-title">
           Round {{ value.round }}st Lap - {{ value.distance }}m
         </h2>
-        <!-- <p>Distance: {{ value.distance }} meters</p> -->
         <Table
           :headers="headers"
           :items="
@@ -41,11 +40,6 @@ export default {
   },
   computed: {
     ...mapState('programs', ['rounds', 'distances']),
-  },
-  methods: {},
-  mounted() {
-    console.log('rounds :>> ', this.rounds)
-    console.log('distances :>> ', this.distances)
   },
 }
 </script>

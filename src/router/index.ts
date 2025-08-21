@@ -4,6 +4,11 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
+    name: 'Welcome',
+    component: () => import('../views/Welcome.vue'),
+  },
+  {
+    path: '/racing',
     name: 'HorseRacingView',
     component: () => import('../views/HorseRacingView.vue'),
   },
