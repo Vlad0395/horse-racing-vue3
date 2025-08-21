@@ -73,7 +73,7 @@ const state: RacesState = {
   sequenceRunning: false,
   currentRoundIndex: null,
   sequenceTimerId: null,
-  gapMs: 10000, // 10s pause between races
+  gapMs: 3000, // 3s pause between races
   raceDurationMs: 0, // 0 = instant finish (can adjust later)
 }
 
