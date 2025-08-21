@@ -6,8 +6,6 @@
 
 @for $i from 1 through 20
   $step: 4px
-  .border-radius-#{$i}
-    border-radius: #{ $i * $step }
   .m-#{$i}
     margin: #{ $i * $step }
   .mt-#{$i}
@@ -65,7 +63,9 @@
 .min-w
   &-300
     min-width: 300px
-
+.border
+  &-none
+    border: none
 $overflow: ('hidden', 'scroll', 'auto', 'visible')
 @each $var in $overflow
   .overflow
@@ -76,7 +76,7 @@ $overflow: ('hidden', 'scroll', 'auto', 'visible')
     &-x-#{$var}
       overflow-x: #{$var}
 
-$colors: ('primary', 'secondary')
+$colors: ('primary', 'secondary', 'white', 'black')
 @each $name in $colors
   .bg
     &-#{$name}

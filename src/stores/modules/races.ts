@@ -179,6 +179,7 @@ const actions = {
     if (state.active) commit('finishRace')
     commit('setSequenceRunning', false)
     commit('setCurrentRoundIndex', null)
+    commit('clear')
   },
   _advanceSequence({ state, commit, dispatch, rootGetters }: any) {
     const rounds = rootGetters['programs/rounds'] || []
@@ -206,16 +207,22 @@ const actions = {
     }
     // Minimum duration fallback
     if (!duration || duration < 3000) duration = 3000
-    const finalize = () => {
-      commit('finishRace')
-      const nextIdx = idx + 1
-      commit('setCurrentRoundIndex', nextIdx)
-      const timer = setTimeout(() => {
-        dispatch('_advanceSequence')
-      }, state.gapMs)
-      commit('setSequenceTimer', timer as unknown as number)
+    if (state.sequenceRunning) {
+      const finalize = () => {
+        // Додаткова перевірка: якщо sequenceRunning вже false, не запускати далі
+        if (!state.sequenceRunning) return
+        commit('finishRace')
+        const nextIdx = idx + 1
+        commit('setCurrentRoundIndex', nextIdx)
+        // Перевірка перед запуском наступного таймера
+        if (!state.sequenceRunning) return
+        const timer = setTimeout(() => {
+          dispatch('_advanceSequence')
+        }, state.gapMs)
+        commit('setSequenceTimer', timer as unknown as number)
+      }
+      setTimeout(finalize, duration)
     }
-    setTimeout(finalize, duration)
   },
   resetAll({ commit }: any) {
     commit('clear')

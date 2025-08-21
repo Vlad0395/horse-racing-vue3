@@ -5,18 +5,22 @@
     <h1 class="header-title fs-24 fw-600">Horse Racing</h1>
     <div class="header-buttons d-flex items-center gap-3">
       <button
-        class="btn btn-generate-races"
+        class="bg-primary border-radius-1 border-none px-4 py-2 text-white"
         :disabled="active"
         @click="generateAll"
       >
         Generate program
       </button>
-      <button v-if="active" class="btn" @click="cancelProgramSequence">
+      <button
+        v-if="active"
+        class="bg-secondary border-radius-1 border-none px-4 py-2 text-white"
+        @click="cancelProgramSequence"
+      >
         Cancel
       </button>
       <button
         v-else
-        class="btn btn-start-race"
+        class="bg-primary border-radius-1 border-none px-4 py-2 text-white"
         :disabled="!rounds.length"
         @click="runProgramSequence"
       >
