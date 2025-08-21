@@ -48,7 +48,7 @@ export default defineComponent({
       raceAnim: null as ReturnType<typeof useRaceAnimation> | null,
       animParams: {
         startOffset: 1,
-        liveFinish: 95,
+        liveFinish: 94.5,
         finishClusterBase: 100,
         finishClusterGap: 1,
       },

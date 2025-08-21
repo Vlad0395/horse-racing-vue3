@@ -1,8 +1,16 @@
 <template>
-  <header class="header-bar">
-    <h1 class="header-title">Horse Racing</h1>
-    <div class="header-buttons">
-      <button class="btn btn-generate-races" :disabled="active" @click="generateAll">Generate program</button>
+  <header
+    class="header-bar w-100 d-flex justify-space-between items-center px-5 py-3"
+  >
+    <h1 class="header-title fs-24 fw-600">Horse Racing</h1>
+    <div class="header-buttons d-flex items-center gap-3">
+      <button
+        class="btn btn-generate-races"
+        :disabled="active"
+        @click="generateAll"
+      >
+        Generate program
+      </button>
       <button v-if="active" class="btn" @click="cancelProgramSequence">
         Cancel
       </button>
@@ -43,21 +51,12 @@ export default {
 .header
   &-bar
     background-color: #f5f5f5
-    padding: 10px 20px
     border-bottom: 1px solid #eee
-    display: flex
-    justify-content: space-between
-    align-items: center
-    width: 100%
     box-sizing: border-box
 
   &-title
-    font-size: 1.5em
-    font-weight: bold
     color: #333
   &-buttons
-    display: flex
-    align-items: center
     gap: 10px
   &-button
     background-color: transparent
