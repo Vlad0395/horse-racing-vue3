@@ -1,6 +1,6 @@
 <template>
   <main
-    class="main d-flex justify-space-between w-100 items-center overflow-y-auto"
+    class="main bg-light-gray d-flex flex-column justify-space-between w-100 items-center overflow-y-auto"
   >
     <HeaderBar />
     <template v-if="isLessThan">
@@ -95,10 +95,8 @@ export default {
 <style lang="sass" scoped>
 
 .main
-  flex-direction: column
   min-height: 100vh
   height: calc(100vh - 100px)
-  background: #E3E3E3
   box-sizing: border-box
   overflow-y: auto
   &__content

@@ -1,9 +1,9 @@
 <template>
   <div
-    class="racetrack border-radius-1 d-flex relative overflow-hidden px-3 pb-8 pt-2 flex-column"
+    class="racetrack border-radius-1 d-flex flex-column relative overflow-hidden px-3 pb-8 pt-2"
   >
     <div class="racetrack__finish-line absolute" ref="finishLineRef" />
-    <div class="racetrack__lanes d-grid relative h-100 gap-0">
+    <div class="racetrack__lanes d-grid h-100 relative gap-0">
       <LineTrack
         v-for="lane in lanes"
         :key="(lane as Lane).number"
@@ -12,7 +12,9 @@
         :horseStyle="horseStyle"
       />
     </div>
-    <div class="racetrack__footer d-flex justify-space-between items-center fs-14 fw-600 mt-2">
+    <div
+      class="racetrack__footer d-flex justify-space-between fs-14 fw-600 mt-2 items-center"
+    >
       <span class="lap">{{ lapLabel }}</span>
       <span class="finish-text">FINISH</span>
     </div>

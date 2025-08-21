@@ -1,15 +1,15 @@
 <template>
   <div class="info-panel min-w-200 overflow-auto">
     <div
-      class="info-panel__header d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
+      class="info-panel__header bg-panel-gray d-flex justify-space-between border-radius-2 mb-3 items-center px-4 py-2"
     >
-      <h1 class="fs-24">{{ title }}</h1>
+      <h1 class="fs-24 text-text-dark m-0">{{ title }}</h1>
     </div>
     <div>
       <div
         v-for="item in items"
         :key="itemKey(item)"
-        class="info-panel__round border-radius-2 mb-3"
+        class="bg-accent border-radius-2 mb-3"
       >
         <h2 class="fs-16 fw-600 mb-2 p-3">
           <slot name="subtitle" :item="item">
@@ -51,11 +51,5 @@ export default {
 .info-panel
   height: calc(100vh - 120px)
   &__header
-    background: #f5f5f5
-    border-bottom: 1px solid #e0e0e0
-    h1
-      margin: 0
-      color: #333
-  &__round
-    background: #fecaca
+    border-bottom: 1px solid var(--border-gray)
 </style>

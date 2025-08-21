@@ -1,11 +1,11 @@
 <template>
   <header
-    class="header-bar w-100 d-flex justify-space-between items-center px-5 py-3"
+    class="header-bar bg-panel-gray w-100 d-flex justify-space-between items-center px-5 py-3"
   >
-    <h1 class="header-title fs-24 fw-600">Horse Racing</h1>
-    <div class="header-buttons d-flex items-center gap-3">
+    <h1 class="header-title text-text-dark fs-24 fw-600">Horse Racing</h1>
+    <div class="header-buttons d-flex gap-3 items-center">
       <button
-        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white"
+        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
         :disabled="races.length !== rounds.length"
         @click="generateAll"
       >
@@ -13,14 +13,14 @@
       </button>
       <button
         v-if="active || (races.length > 0 && races.length !== rounds.length)"
-        class="btn bg-secondary border-radius-1 fs-16 border-none px-4 py-2 text-white"
+        class="btn bg-deep-blue border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
         @click="cancelProgramSequence"
       >
         Cancel
       </button>
       <button
         v-else
-        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white"
+        class="btn bg-primary border-radius-1 fs-16 border-none px-4 py-2 text-white cursor-pointer"
         :disabled="races.length !== 0"
         @click="runProgramSequence"
       >
@@ -54,26 +54,18 @@ export default {
 <style lang="sass" scoped>
 .header
   &-bar
-    background-color: #f5f5f5
-    border-bottom: 1px solid #eee
+    border-bottom: 1px solid var(--border-gray)
     box-sizing: border-box
     @media screen and (max-width: 375px)
       padding: 8px 24px
       flex-direction: column
       align-items: flex-start
-
-  &-title
-    color: #333
   &-buttons
-    gap: 10px
     @media screen and (max-width: 375)
       flex-direction: column
       width: 100%
   &-button
     background-color: transparent
     border: none
-    cursor: pointer
-    padding: 0.5em 1em
-    border-radius: 4px
     transition: background-color 0.3s
 </style>

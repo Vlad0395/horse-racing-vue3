@@ -1,6 +1,6 @@
 <template>
   <div class="tabs w-100 d-flex flex-column px-3">
-    <div class="tab-headers d-flex w-100 border-radius-2 my-3 overflow-hidden">
+    <div class="tab-headers bg-panel-gray d-flex w-100 border-radius-2 my-3 overflow-hidden">
       <button
         v-for="(tab, idx) in tabs"
         :key="idx"
@@ -53,12 +53,11 @@ export default {
   box-sizing: border-box;
 }
 .tab-headers {
-  background: #f5f5f5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .tab-headers button {
   flex: 1 1 0;
-  color: #757575;
+  color: var(--text-gray);
   background: transparent;
   border: none;
   outline: none;
@@ -68,7 +67,7 @@ export default {
     box-shadow 0.2s;
 }
 .tab-headers button.active {
-  background: #fff;
+  background: var(--white);
   color: #222;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }

@@ -1,6 +1,6 @@
 <template>
   <table class="table__container w-100 border-radius-2 overflow-hidden">
-    <thead class="table__head">
+    <thead class="bg-panel-gray">
       <tr class="table__row">
         <th
           v-for="header in headers"
@@ -12,12 +12,12 @@
         </th>
       </tr>
     </thead>
-    <tbody class="table__body">
+    <tbody class="table__body bg-white">
       <template v-if="items.length">
         <tr v-for="item in items" :key="item.id">
           <td
             v-for="header in headers"
-            class="table__cell fs-16 px-4 py-3"
+            class="table__cell text-text-dark fs-16 px-4 py-3"
             :style="{ width: header?.width ?? '100%' }"
           >
             {{ getItemValue(item, header.value) }}
@@ -26,7 +26,7 @@
       </template>
       <tr v-else>
         <td
-          class="table__cell fs-16 px-4 py-3 text-center"
+          class="table__cell text-text-dark fs-16 px-4 py-3 text-center"
           :colspan="headers.length"
         >
           {{ noDataText }}
@@ -60,10 +60,8 @@ export default {
     border-collapse: separate
     border-spacing: 0
     box-shadow: 0 2px 8px rgba(0,0,0,0.08)
-  &__head
-    background: #f5f5f5
   &__header
-    border-bottom: 2px solid #e0e0e0
+    border-bottom: 2px solid var(--border-gray)
   &__row
     &:first-child
       .table__header
@@ -78,10 +76,5 @@ export default {
         &:last-child
           border-bottom-right-radius: 8px
   &__cell
-    border-bottom: 1px solid #e0e0e0
-    color: #333
-  &__body
-    background: #fff
-  &__count
-    color: #666
+    border-bottom: 1px solid var(--border-gray)
 </style>
