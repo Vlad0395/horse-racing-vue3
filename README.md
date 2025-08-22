@@ -1,35 +1,64 @@
-# 🏇 Horse Racing
 
-This project simulates horse racing. You can run races, add horses, view results, and analyze statistics.
 
-## 🚀 Getting Started
+# Horse Racing Game Front-End
+
+## Description
+Web application for horse racing simulation. Built with Vue 3, TypeScript, and Vite. Includes animation, program generation, results, responsive UI, and testing.
+
+## Project Structure
+
+- `src/components/` — main UI components (Racetrack, HorsesList, Results, Programs, InfoPanel, Table, Tabs)
+- `src/composables/` — animation logic, reactive hooks
+- `src/views/` — main pages
+- `src/stores/` — Vuex store (race state, horses, programs)
+- `src/styles/` — styles, variables, mixins
+- `cypress/` — e2e tests
+- `src/__tests__/` — unit tests
+
+## Installation
 
 1. Clone the repository:
-  ```
-  git clone https://github.com/Vlad95/horse-racing.git
-  ```
-2. Navigate to the project directory:
-  ```
+  ```sh
+  git clone https://github.com/Vlad0395/horse-racing-vue3.git
   cd horse-racing
   ```
-3. Read the documentation and follow the instructions to launch the application.
+2. Install dependencies:
+  ```sh
+  npm install
+  ```
 
-## 📦 Features
+## Running the Project
 
-- Add and edit horses
-- Run races
-- Display results
-- Statistics and analytics
+```sh
+npm run dev
+```
+The app will be available at http://localhost:5173 (or the port shown in the console).
 
-## 🛠️ Technologies
+## Running Tests
 
-- Vue / Vuex / JavaScript / HTML / SASS
-- Web interface
+### Unit tests (Vitest)
+```sh
+npm run test
+```
 
-## 📄 License
+### E2E tests (Cypress)
+```sh
+npm run e2e
+```
+or
+```sh
+npx cypress open
+```
 
-This project is licensed under the MIT License.
+## Technologies
+- Vue 3
+- TypeScript
+- Vite
+- Cypress
+- Vitest
 
----
+## Responsiveness
+The interface adapts to different screen sizes, including mobile version.
 
-Made with ❤️ for horse racing fans!
+## Author
+Vlad0395
