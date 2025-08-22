@@ -1,9 +1,12 @@
-
-
 # Horse Racing Game Front-End
 
 ## Description
+
 Web application for horse racing simulation. Built with Vue 3, TypeScript, and Vite. Includes animation, program generation, results, responsive UI, and testing.
+
+## Demo
+
+Play online: [https://horse-rasing-my-digital-portfolios-projects.vercel.app/](https://horse-rasing-my-digital-portfolios-projects.vercel.app/)
 
 ## Project Structure
 
@@ -18,39 +21,48 @@ Web application for horse racing simulation. Built with Vue 3, TypeScript, and V
 ## Installation
 
 1. Clone the repository:
-  ```sh
-  git clone https://github.com/Vlad0395/horse-racing-vue3.git
-  cd horse-racing
-  ```
+
+```sh
+git clone https://github.com/Vlad0395/horse-racing-vue3.git
+cd horse-racing
+```
+
 2. Install dependencies:
-  ```sh
-  npm install
-  ```
+
+```sh
+npm install
+```
 
 ## Running the Project
 
 ```sh
 npm run dev
 ```
+
 The app will be available at http://localhost:5173 (or the port shown in the console).
 
 ## Running Tests
 
 ### Unit tests (Vitest)
+
 ```sh
 npm run test
 ```
 
 ### E2E tests (Cypress)
+
 ```sh
 npm run e2e
 ```
+
 or
+
 ```sh
 npx cypress open
 ```
 
 ## Technologies
+
 - Vue 3
 - TypeScript
 - Vite
@@ -58,7 +70,9 @@ npx cypress open
 - Vitest
 
 ## Responsiveness
+
 The interface adapts to different screen sizes, including mobile version.
 
 ## Author
+
 Vlad0395
