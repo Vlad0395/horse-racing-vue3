@@ -26,10 +26,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import type { HorseBase } from '../utils/horseNames'
 import Icon from './IconHorse.vue'
-import { useRaceAnimation } from '../composables/useRaceAnimation'
 import type { ProgramRound } from '../stores/modules/programs'
 import type { Race } from '../stores/modules/races'
 import LineTrack from './LineTrack.vue'
@@ -47,7 +46,6 @@ export default defineComponent({
   data() {
     return {
       postFinishResetDelayMs: 1500,
-      raceAnim: null as ReturnType<typeof useRaceAnimation> | null,
       animParams: {
         startOffset: 1,
         liveFinish: 94.5,
@@ -60,6 +58,9 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       currentRace: 'races/current',
+    }),
+    ...mapGetters({
+      horsePosition: 'raceAnimation/horsePosition',
     }),
     ...mapState('programs', {
       totalHorsesPerRound: (state: { totalHorsesPerRound: number }) =>
@@ -114,14 +115,6 @@ export default defineComponent({
     },
   },
   created() {
-    // @ts-ignore
-    this.raceAnim = useRaceAnimation({
-      getActiveRace: () => this.activeRace,
-      getPlanned: () =>
-        this.activeRace ? (this.activeRace as Race).planned || [] : [],
-      getHorseKeys: () =>
-        (this.horsesInRace as HorseBase[]).map((h) => this.horseKey(h)),
-    })
     this.initProgress()
   },
 
@@ -132,43 +125,34 @@ export default defineComponent({
   },
   watch: {
     horsesInRace() {
-      if (!this.raceAnim) return
       this.initProgress()
     },
     currentRace() {
-      if (!this.raceAnim) return
       this.initProgress()
     },
     programRounds() {
       if (!this.activeRace) {
-        if (!this.raceAnim) return
         this.initProgress()
       }
     },
   },
   methods: {
-    horseKey(h: HorseBase) {
-      return h.id
-    },
+    ...mapActions('raceAnimation', ['init']),
     initProgress() {
-      if (!this.raceAnim) return
-      this.raceAnim.init()
+      this.init({
+        getActiveRace: () => this.activeRace,
+        horseKeys: (this.horsesInRace as HorseBase[]).map((h) => h.id),
+      })
     },
     horseStyle(h: HorseBase) {
-      if (!this.raceAnim) return
       const liveFinish = this.calcFinishPercent()
-      const x = this.raceAnim.getHorsePosition(
-        h,
-        this.raceAnim.progressMap,
-        this.animParams.startOffset,
-        liveFinish
-      )
+      const x = this.horsePosition(h, this.animParams.startOffset, liveFinish)
       const left = Math.min(x, liveFinish ?? 95)
       return { left: `${left}%`, transform: 'translateY(-50%) scaleX(-1)' }
     },
 
     calcFinishPercent() {
-      const track = this.$el.querySelector('.lane__track')
+      const track = this.$el?.querySelector('.lane__track') ?? null
       const finish = this.$refs.finishLineRef as HTMLElement | undefined
       if (track && finish) {
         const trackRect = track.getBoundingClientRect()
