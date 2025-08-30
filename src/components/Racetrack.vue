@@ -2,11 +2,11 @@
   <div
     class="racetrack border-radius-1 d-flex flex-column relative overflow-hidden px-3 pb-8 pt-2"
   >
-    <div class="racetrack__finish-line absolute" ref="finishLineRef" />
     <div
       class="racetrack__lanes d-grid h-100 relative gap-0"
       ref="racetrackRef"
     >
+      <div class="racetrack__finish-line absolute" ref="finishLineRef" />
       <LineTrack
         v-for="lane in lanes"
         :key="(lane as Lane).number"

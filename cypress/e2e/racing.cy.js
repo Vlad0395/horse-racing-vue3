@@ -32,19 +32,31 @@ describe('Horse Racing View', () => {
       cy.get('.btn-generate').click()
       cy.get('.btn-start').click()
 
-      // Дочекаємось завершення гонки (можливо, треба почекати трохи)
       cy.wait(60000)
 
-      // Знаходимо фінішну лінію та коня
       cy.get('.racetrack__finish-line').then(($finish) => {
         const finishLeft = $finish[0].getBoundingClientRect().left
-        console.log('finishLeft :>> ', finishLeft);
+        console.log('finishLeft :>> ', finishLeft)
         cy.get('.horse').each(($horse) => {
           const horseLeft = $horse[0].getBoundingClientRect().left
-          // Перевіряємо, що позиція коня не більша за позицію фінішу
-          expect(horseLeft).to.be.at.most(finishLeft + 2) // +2 px запас
+          expect(horseLeft).to.be.at.most(finishLeft + 2)
         })
       })
+    })
+  })
+  describe('Horse Racing Mobile Responsiveness', () => {
+    const width = 375
+    const height = 466
+    it('should show and allow scrolling of the racetrack on mobile', () => {
+      cy.viewport(width, height)
+      cy.visit('/racing')
+      cy.get('.racetrack').should('be.visible')
+      cy.get('.racetrack').then(($el) => {
+        const el = $el[0]
+        expect(el.scrollHeight).to.be.greaterThan(el.clientHeight)
+      })
+      cy.get('.racetrack').scrollTo('bottom')
+      cy.get('.racetrack__finish-line').should('be.visible')
     })
   })
 })

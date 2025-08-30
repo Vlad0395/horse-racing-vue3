@@ -2,20 +2,22 @@
   background: #d9d9d9
   flex: 1
   box-shadow: 0 0 0 1px #c5c5c5 inset
-
+  overflow-y: auto
+  max-height: 100vh
   &__lanes
     flex: 1
     grid-template-rows: repeat(10, 1fr)
     min-height: 625px
     box-sizing: border-box
+    position: relative
     @media screen and (max-width: 1366px)
       min-height: 420px
     @media screen and (max-width: 600px)
       min-height: 280px
 
   &__finish-line
-    top: 8px
-    bottom: 56px
+    top: 0px
+    bottom: 0px
     right: 60px
     width: 3px
     background: #c52a1f
